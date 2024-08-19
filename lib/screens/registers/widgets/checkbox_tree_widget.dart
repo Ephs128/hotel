@@ -90,10 +90,16 @@ class CustomCheckbox extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label),
-        Checkbox(
-          checked: checked, 
-          onChanged: onChanged,
+        Flexible(
+          child: Text(
+            label, 
+          ),
+        ),
+        Flexible(
+          child: Checkbox(
+            checked: checked, 
+            onChanged: onChanged,
+          ),
         ),
       ],
     );

@@ -26,14 +26,18 @@ class _CheckboxGroupState<T> extends State<CheckboxGroup<T>> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(k.toString()),
-            Checkbox(
-              checked: v, 
-              onChanged: widget.readOnly ? null : (value) {
-                setState(() {
-                  widget.mapPairs[k] = !v;
-                });
-              }
+            Flexible(
+              child: Text(k.toString()),
+            ),
+            Flexible(
+              child: Checkbox(
+                checked: v, 
+                onChanged: widget.readOnly ? null : (value) {
+                  setState(() {
+                    widget.mapPairs[k] = !v;
+                  });
+                }
+              ),
             ),
           ],
         ),

@@ -261,6 +261,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Flexible(
+                      flex: 1,
                       child: InfoLabel(
                         label: "Rol",
                         child: Padding(
@@ -283,8 +284,9 @@ class _UserFormScreenState extends State<UserFormScreen> {
                         ),
                       ),
                     ),
-                    const Spacer(),
+                    const SizedBox(width: 30,),
                     Flexible(
+                      flex: 1,
                       child: Expander(
                         initiallyExpanded: true,
                         header: const Text("Almacenes"),
@@ -294,8 +296,9 @@ class _UserFormScreenState extends State<UserFormScreen> {
                         ),
                       ),
                     ),
-                    const Spacer(),
+                    const SizedBox(width: 30,),
                     Flexible(
+                      flex: 1,
                       child: Expander(
                         initiallyExpanded: true,
                         header: const Text("Cuentas"),
