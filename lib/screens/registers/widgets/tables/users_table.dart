@@ -57,7 +57,6 @@ class UsersTable extends StatelessWidget {
                   changeScreenTo(
                     UserFormScreen(
                       changeScreenTo: changeScreenTo, 
-                      title: "Ver usuario",
                       readOnly: true,
                       user: user,
                     )
@@ -67,7 +66,6 @@ class UsersTable extends StatelessWidget {
                   changeScreenTo(
                     UserFormScreen(
                       changeScreenTo: changeScreenTo, 
-                      title: "Modificar usuario",
                       user: user,
                     )
                   );

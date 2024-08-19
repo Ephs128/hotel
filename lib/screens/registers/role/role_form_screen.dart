@@ -1,10 +1,21 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:hotel/data/models/role_model.dart';
 import 'package:hotel/screens/registers/role/permission_tree_data.dart';
+import 'package:hotel/screens/registers/role/roles_register_screen.dart';
 import 'package:hotel/screens/registers/widgets/checkbox_tree_widget.dart';
+import 'package:hotel/screens/registers/widgets/forms/footer_form_widget.dart';
+import 'package:hotel/screens/registers/widgets/forms/header_form_widget.dart';
 
 class RoleFormScreen extends StatefulWidget {
+  final Function(Widget) changeScreenTo;
+  final Role? role;
+  final bool readOnly;
+
   const RoleFormScreen({
     super.key,
+    required this.changeScreenTo, 
+    this.role, 
+    this.readOnly = false,
   });
 
   @override
@@ -12,8 +23,10 @@ class RoleFormScreen extends StatefulWidget {
 }
 
 class _RoleFormScreenState extends State<RoleFormScreen> {
-  final TextEditingController roleName = TextEditingController();
   final GlobalKey<FormState> _rolesFormState = GlobalKey<FormState>();
+
+  final TextEditingController roleName = TextEditingController();
+
   final ParentTreeData configurationData = ParentTreeData(
     title: "Configuración", 
     children: [
@@ -82,33 +95,68 @@ class _RoleFormScreenState extends State<RoleFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Form(
-        key: _rolesFormState,
-        child: Column(
-          children: [
-            InfoLabel(
-              label: "Nombre",
-              child: TextFormBox(),
+    final String title = _createTitle();
+    if (widget.role != null) {
+      roleName.text = widget.role!.role;
+    }
+
+    return Form(
+      key: _rolesFormState,
+      child: Column(
+        children: [
+          HeaderFormWidget(
+            back: () => backFunction(), 
+            title: title),
+          const SizedBox(height: 30,),
+          InfoLabel(
+            label: "Nombre",
+            child: TextFormBox(
+              readOnly: widget.readOnly,
+              controller: roleName,
+              expands: false,
             ),
-            const SizedBox(height: 30,),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Flexible(
-                  child: CheckboxTreeWidget(treeData: configurationData),
-                ),
-                Flexible(
-                  child: CheckboxTreeWidget(treeData: cuentaData),
-                ),
-                Flexible(
-                  child: CheckboxTreeWidget(treeData: sellsData),
-                ),
-              ],
-            )
-          ],
-        ),
+          ),
+          const SizedBox(height: 30,),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Flexible(
+                child: CheckboxTreeWidget(treeData: configurationData),
+              ),
+              Flexible(
+                child: CheckboxTreeWidget(treeData: cuentaData),
+              ),
+              Flexible(
+                child: CheckboxTreeWidget(treeData: sellsData),
+              ),
+            ],
+          ),
+          const SizedBox(height: 30,),
+          FooterFormWidget(
+            submit: () {}, 
+            cancel: () {backFunction();},
+            readOnly: widget.readOnly,
+          ),
+        ],
       ),
     );
   }
+
+  void backFunction() {
+    widget.changeScreenTo(RolesRegisterScreen(changeScreenTo: widget.changeScreenTo));
+  }
+
+  String _createTitle() {
+    String title = "Nuevo ";
+      if(widget.role != null) {
+        if (widget.readOnly) {
+          title = "Ver ";
+        } else {
+          title = "Editar ";
+        }
+      }
+      title += "rol";
+      return title;
+  }
+
 }

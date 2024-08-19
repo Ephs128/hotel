@@ -21,30 +21,30 @@ class UsersRegisterScreen extends StatefulWidget {
 }
 
 class _UsersRegisterScreenState extends State<UsersRegisterScreen> {
-  List<User> users = [];
-  bool isLoaded = false;
-  Data<List<User>>? result;
+  List<User> _users = [];
+  bool _isLoaded = false;
+  Data<List<User>>? _result;
 
   @override
   void initState() {
     super.initState();
-    fetchUsers();
+    _fetchUsers();
   }
 
-  Future<void> fetchUsers() async {
+  Future<void> _fetchUsers() async {
     final userService = UserService();
-    result = await userService.getAllUsers();
-    users =  result!.data ?? [];
+    _result = await userService.getAllUsers();
+    _users =  _result!.data ?? [];
     setState(() {
-      isLoaded = true;
+      _isLoaded = true;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (isLoaded) {
-    return result!.data == null ? 
-        ErrorScreen(message: result!.message)
+    if (_isLoaded) {
+    return _result!.data == null ? 
+        ErrorScreen(message: _result!.message)
       : Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -57,14 +57,13 @@ class _UsersRegisterScreenState extends State<UsersRegisterScreen> {
                 widget.changeScreenTo(
                   UserFormScreen(
                     changeScreenTo: widget.changeScreenTo, 
-                    title: "Nuevo usuario"
                   )
                 );
               },
             ),
             const SizedBox(height: 30,),
             UsersTable(
-              usersList: users,
+              usersList: _users,
               changeScreenTo: widget.changeScreenTo,
             ),
           ],

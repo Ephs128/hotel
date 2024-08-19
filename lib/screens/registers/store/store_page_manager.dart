@@ -19,7 +19,7 @@ class _StorePageManagerState extends State<StorePageManager> {
 
   @override
   Widget build(BuildContext context) {
-    selectedPage = selectedPage ?? StoreRegisterScreen(changeScreenTo: changeScreenTo);
+    selectedPage ??= StoreRegisterScreen(changeScreenTo: changeScreenTo);
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(20),

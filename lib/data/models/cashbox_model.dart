@@ -32,4 +32,9 @@ class Cashbox {
     "numberAccount": numberAccount,
     "state": state ? 1 : 0,
   };
+
+  @override
+  String toString() {
+    return name;
+  }
 }

@@ -51,12 +51,17 @@ class _RolesRegisterScreenState extends State<RolesRegisterScreen> {
             child: const Icon(FluentIcons.add_medium),
             onPressed: () {
               widget.changeScreenTo(
-                const RoleFormScreen()
+                RoleFormScreen(
+                  changeScreenTo: widget.changeScreenTo,
+                )
               );
             },
           ),
           const SizedBox(height: 20,),
-          RolesTableWidget(roleList: roles),
+          RolesTableWidget(
+            changeScreenTo: widget.changeScreenTo,
+            roleList: roles
+          ),
         ],
       );
     } else {

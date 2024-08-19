@@ -42,9 +42,10 @@ class _CashboxFormScreenState extends State<CashboxFormScreen> {
       child: Column(
         children: [
           HeaderFormWidget(
-            back: () { backFunction(); }, 
+            back: () => backFunction(), 
             title: title,
           ),
+          const SizedBox(height: 30,),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 48),
             child: InfoLabel(
@@ -89,11 +90,12 @@ class _CashboxFormScreenState extends State<CashboxFormScreen> {
               ),
             ),
           ),
+          const SizedBox(height: 30,),
           FooterFormWidget(
             submit: () {}, 
-            cancel: () {backFunction();},
+            cancel: () => backFunction(),
             readOnly: widget.readOnly,
-          )
+          ),
         ],
       ),
     );
@@ -104,7 +106,7 @@ class _CashboxFormScreenState extends State<CashboxFormScreen> {
   }
 
   String _createTitle() {
-    String title = "Nuevo ";
+    String title = "Nueva ";
       if(widget.cashbox != null) {
         if (widget.readOnly) {
           title = "Ver ";
@@ -112,7 +114,7 @@ class _CashboxFormScreenState extends State<CashboxFormScreen> {
           title = "Editar ";
         }
       }
-      title += "almacen";
+      title += "cuenta";
       return title;
   }
 }

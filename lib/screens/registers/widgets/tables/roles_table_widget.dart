@@ -1,5 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:hotel/data/models/role_model.dart';
+import 'package:hotel/screens/registers/role/role_form_screen.dart';
 import 'package:hotel/screens/registers/widgets/tables/table_cells/actions_table_cell.dart';
 import 'package:hotel/screens/registers/widgets/tables/table_cells/header_table_cell.dart';
 import 'package:hotel/screens/registers/widgets/tables/table_cells/normal_table_cell.dart';
@@ -7,9 +8,12 @@ import 'package:hotel/screens/registers/widgets/tables/table_cells/state_table_c
 
 class RolesTableWidget extends StatelessWidget {
   final List<Role> roleList;
+  final Function(Widget) changeScreenTo;
+
   const RolesTableWidget({
     super.key, 
     required this.roleList,
+    required this.changeScreenTo,
   });
 
   @override
@@ -42,8 +46,23 @@ class RolesTableWidget extends StatelessWidget {
                 inactiveColor: Colors.grey[110],
               ),
               ActionsTableCell(
-                onSeePressed: () {},
-                onEditPressed: () {},
+                onSeePressed: () {
+                  changeScreenTo(
+                    RoleFormScreen(
+                      role: role,
+                      readOnly: true,
+                      changeScreenTo: changeScreenTo
+                    )
+                  );
+                },
+                onEditPressed: () {
+                  changeScreenTo(
+                    RoleFormScreen(
+                      role: role,
+                      changeScreenTo: changeScreenTo
+                    )
+                  );
+                },
                 onDeletePressed: () {},
               )
             ]

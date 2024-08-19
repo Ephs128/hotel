@@ -39,6 +39,7 @@ class _StoreFormScreenState extends State<StoreFormScreen> {
             back: () { backFunction(); }, 
             title: title,
           ),
+          const SizedBox(height: 30,),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 48),
             child: InfoLabel(
@@ -50,6 +51,7 @@ class _StoreFormScreenState extends State<StoreFormScreen> {
               ),
             ),
           ),
+          const SizedBox(height: 30,),
           FooterFormWidget(
             submit: () {}, 
             cancel: () {backFunction();},
