@@ -34,12 +34,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               body: const RolePageManager(),
             ),
             PaneItem(
-              icon: const Icon(FluentIcons.home),
+              icon: const Icon(FluentIcons.repo),
               title: const Text("Almacenes"),
               body: const StorePageManager(),
             ),
             PaneItem(
-              icon: const Icon(FluentIcons.home),
+              icon: const Icon(FluentIcons.money),
               title: const Text("Cuentas"),
               body: const CashboxPageManager(),
             ),

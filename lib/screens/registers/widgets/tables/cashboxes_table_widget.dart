@@ -1,19 +1,25 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:hotel/data/models/cashbox_model.dart';
+import 'package:hotel/data/models/data.dart';
+import 'package:hotel/data/service/cashbox_service.dart';
 import 'package:hotel/screens/registers/cashbox/cashbox_form_screen.dart';
 import 'package:hotel/screens/registers/widgets/tables/table_cells/actions_table_cell.dart';
 import 'package:hotel/screens/registers/widgets/tables/table_cells/header_table_cell.dart';
 import 'package:hotel/screens/registers/widgets/tables/table_cells/normal_table_cell.dart';
 import 'package:hotel/screens/registers/widgets/tables/table_cells/state_table_cell.dart';
 
+import 'package:hotel/screens/widgets/dialog_functions.dart' as dialog_function;
+
 class CashboxesTableWidget extends StatelessWidget {
   final List<Cashbox> cashboxList;
   final Function(Widget) changeScreenTo;
+  final Function() reload;
   
   const CashboxesTableWidget({
     super.key, 
     required this.cashboxList,
-    required this.changeScreenTo,
+    required this.changeScreenTo, 
+    required this.reload, 
   });
 
   @override
@@ -72,11 +78,30 @@ class CashboxesTableWidget extends StatelessWidget {
                     )
                   );
                 },
-                onDeletePressed: () {},
+                onDeletePressed: () {
+                  dialog_function.showConfirmationDialog(
+                    context, 
+                    "Confirmación", 
+                    "Está por eliminar la cuenta ${cashbox.name}", 
+                    () {deleteCashbox(context, cashbox);}
+                  );
+                },
               )
             ]
           )
       ],
     );
+  }
+
+  Future<void> deleteCashbox(BuildContext context, Cashbox cashbox) async {
+    dialog_function.showLoaderDialog(context);
+    final cashboxService = CashboxService();
+    Data<String> result = await cashboxService.deleteCashbox(cashbox);
+    if(context.mounted) dialog_function.closeLoaderDialog(context);
+    if (result.data == null) {
+      if (context.mounted) dialog_function.showInfoDialog(context, "Error", result.message);
+    } else {
+      reload();
+    }
   }
 }

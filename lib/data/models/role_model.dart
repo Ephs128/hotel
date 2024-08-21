@@ -25,4 +25,13 @@ class Role {
   String toString() {
     return role;
   }
+
+  @override
+  bool operator == (Object other) {
+    return other is Role && other.id == id;
+  }
+  
+  @override
+  int get hashCode => id.hashCode;
+  
 }

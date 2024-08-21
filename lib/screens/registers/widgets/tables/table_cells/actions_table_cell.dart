@@ -41,7 +41,7 @@ class ActionsTableCell extends StatelessWidget {
               backgroundColor: WidgetStatePropertyAll<Color>(constants.deleteButtonBackground),
               foregroundColor: WidgetStatePropertyAll<Color>(constants.deleteButtonForegorund),
             ),
-            onPressed: () {},
+            onPressed: onDeletePressed,
             child: const Text(constants.deleteButtonLabel), 
           ),
         ],

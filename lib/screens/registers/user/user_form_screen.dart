@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:hotel/data/models/cashbox_model.dart';
 import 'package:hotel/data/models/role_model.dart';
 import 'package:hotel/data/models/store_model.dart';
+import 'package:hotel/data/models/user_cashbox_model.dart';
 import 'package:hotel/data/models/user_model.dart';
+import 'package:hotel/data/models/user_store_model.dart';
 import 'package:hotel/data/service/cashbox_service.dart';
 import 'package:hotel/data/service/role_service.dart';
 import 'package:hotel/data/service/store_service.dart';
@@ -118,20 +120,22 @@ class _UserFormScreenState extends State<UserFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final String title = _createTitle();
-    if (widget.user != null ) {
-      name.text = widget.user!.person.name;
-      firstLastname.text = widget.user!.person.firstLastname;
-      secondLastname.text = widget.user!.person.secondLastname ?? "";
-      identityDocumentation.text = widget.user!.person.identityDocument;
-      email.text = widget.user!.person.email;
-      user.text = widget.user!.user;
-      phone.text = widget.user!.person.phone;
-      address.text = widget.user!.person.address;
-      password.text = widget.user!.password;
-    }
-
     if (_isLoaded){
+      final String title = _createTitle();
+      if (widget.user != null) {
+        name.text = widget.user!.person.name;
+        firstLastname.text = widget.user!.person.firstLastname;
+        secondLastname.text = widget.user!.person.secondLastname ?? "";
+        identityDocumentation.text = widget.user!.person.identityDocument;
+        email.text = widget.user!.person.email;
+        user.text = widget.user!.user;
+        phone.text = widget.user!.person.phone;
+        address.text = widget.user!.person.address;
+        password.text = widget.user!.password;
+        selectedRole = widget.user!.role;
+        _updateMapBoolStore(storeMap, widget.user!.stores);
+        _updateMapBoolCashbox(cashboxMap, widget.user!.cashboxes);
+      }
       selectedRole ??= roleList.first;
       return errorMsg != null ? 
         ErrorScreen(message: errorMsg!)
@@ -266,7 +270,14 @@ class _UserFormScreenState extends State<UserFormScreen> {
                         label: "Rol",
                         child: Padding(
                           padding: const EdgeInsets.only(top: 10),
-                          child: ComboBox<Role>(
+                          child: widget.readOnly ?
+                          TextFormBox(
+                            initialValue: selectedRole!.role,
+                            readOnly: true,
+                          )
+                          : 
+                          ComboBox<Role>(
+                            isExpanded: true,
                             value: selectedRole,
                             items: roleList.map<ComboBoxItem<Role>>((e) {
                               return ComboBoxItem<Role>(
@@ -274,8 +285,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
                                 child: Text(e.toString()),
                               );
                             }).toList(),
-                            onChanged: widget.readOnly ? null :
-                            (value) {
+                            onChanged: (value) {
                               setState(() {
                                 selectedRole = value;
                               });
@@ -327,6 +337,28 @@ class _UserFormScreenState extends State<UserFormScreen> {
 
   void backFunction() {
     widget.changeScreenTo(UsersRegisterScreen(changeScreenTo: widget.changeScreenTo));
+  }
+
+  void _updateMapBoolStore(Map<Store, bool> mapBool, List<UserStore> listSelected) {
+    for(UserStore userStore in listSelected) {
+      for(Store store in mapBool.keys) {
+        if(store.id == userStore.idStore) {
+          mapBool[store] = true;
+          break;
+        }
+      }
+    }
+  }
+
+  void _updateMapBoolCashbox(Map<Cashbox, bool> mapBool, List<UserCashbox> listSelected) {
+    for(UserCashbox userCashbox in listSelected) {
+      for(Cashbox cashbox in mapBool.keys) {
+        if(cashbox.id == userCashbox.idCashbox) {
+          mapBool[cashbox] = true;
+          break;
+        }
+      }
+    }
   }
 
   String _createTitle() {

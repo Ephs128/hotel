@@ -7,12 +7,18 @@ import 'package:hotel/screens/registers/store/store_form_screen.dart';
 import 'package:hotel/screens/registers/widgets/tables/store_table_widget.dart';
 import 'package:hotel/screens/widgets/loading_widget.dart';
 
+import 'package:hotel/screens/widgets/dialog_functions.dart' as dialog_function;
+
 class StoreRegisterScreen extends StatefulWidget {
   final Function(Widget) changeScreenTo;
+  final String? withSuccessMessage;
+  final String? withErrorMessage;
 
   const StoreRegisterScreen({
     super.key, 
-    required this.changeScreenTo
+    required this.changeScreenTo,
+    this.withSuccessMessage,
+    this.withErrorMessage,
   });
 
   @override
@@ -28,6 +34,17 @@ class _StoreRegisterScreenState extends State<StoreRegisterScreen> {
   void initState() {
     super.initState();
     _fetchStores();
+    if (widget.withSuccessMessage != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        dialog_function.showInfoDialog(context, "Operacion exitosa", widget.withSuccessMessage!);
+      });
+    } else {
+      if (widget.withErrorMessage != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          dialog_function.showInfoDialog(context, "Error", widget.withErrorMessage!);
+        });
+      }
+    }
   }
 
   Future<void> _fetchStores() async {
@@ -61,6 +78,12 @@ class _StoreRegisterScreenState extends State<StoreRegisterScreen> {
           StoreTableWidget(
             storeList: stores,
             changeScreenTo: widget.changeScreenTo,
+            reload: () {
+              setState(() {
+                isLoaded = false;
+              });
+              _fetchStores();
+            },
           ),
         ],
       );

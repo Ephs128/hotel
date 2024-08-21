@@ -1,7 +1,7 @@
-import 'package:hotel/data/models/cashbox_model.dart';
 import 'package:hotel/data/models/person_model.dart';
 import 'package:hotel/data/models/role_model.dart';
-import 'package:hotel/data/models/store_model.dart';
+import 'package:hotel/data/models/user_cashbox_model.dart';
+import 'package:hotel/data/models/user_store_model.dart';
 
 class User {
   int idUser;
@@ -13,8 +13,8 @@ class User {
   int registerUser;
   Person person;
   Role role;
-  // List<Store> stores;
-  // List<Cashbox> cashboxes;
+  List<UserStore> stores;
+  List<UserCashbox> cashboxes;
 
   User({
     required this.idUser,
@@ -26,21 +26,28 @@ class User {
     required this.registerUser,
     required this.person,
     required this.role,
-    // required this.stores,
-    // required this.cashboxes,
+    required this.stores,
+    required this.cashboxes,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) => User(
-    idUser: json["idUser"],
-    user: json["user"],
-    password: json["password"],
-    photo: json["photo"],
-    thumbnail: json["thumbnail"],
-    state: json["state"] == 1,
-    registerUser: json["registerUser"],
-    person: Person.fromJson(json["person"]),
-    role: Role.fromJson(json["role"]),
-  );
+  factory User.fromJson(Map<String, dynamic> json) {
+    List<dynamic> listStores = json["userStores"];
+    List<dynamic> listCashboxes = json["userCashboxes"];
+    
+    return User(
+      idUser: json["idUser"],
+      user: json["user"],
+      password: json["password"],
+      photo: json["photo"],
+      thumbnail: json["thumbnail"],
+      state: json["state"] == 1,
+      registerUser: json["registerUser"],
+      person: Person.fromJson(json["person"]),
+      role: Role.fromJson(json["role"]),
+      stores: listStores.map((jsonData) => UserStore.fromJson(jsonData)).toList(),
+      cashboxes: listCashboxes.map((jsonData) => UserCashbox.fromJson(jsonData)).toList(),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     "idUser": idUser,

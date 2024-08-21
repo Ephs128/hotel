@@ -1,19 +1,25 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/models/store_model.dart';
+import 'package:hotel/data/service/store_service.dart';
 import 'package:hotel/screens/registers/store/store_form_screen.dart';
 import 'package:hotel/screens/registers/widgets/tables/table_cells/actions_table_cell.dart';
 import 'package:hotel/screens/registers/widgets/tables/table_cells/header_table_cell.dart';
 import 'package:hotel/screens/registers/widgets/tables/table_cells/normal_table_cell.dart';
 import 'package:hotel/screens/registers/widgets/tables/table_cells/state_table_cell.dart';
 
+import 'package:hotel/screens/widgets/dialog_functions.dart' as dialog_function;
+
 class StoreTableWidget extends StatelessWidget {
   final List<Store> storeList;
   final Function(Widget) changeScreenTo;
+  final Function() reload;
   
   const StoreTableWidget({
     super.key,
     required this.storeList, 
-    required this.changeScreenTo
+    required this.changeScreenTo,
+    required this.reload, 
   });
 
   @override
@@ -63,11 +69,31 @@ class StoreTableWidget extends StatelessWidget {
                     )
                   );
                 },
-                onDeletePressed: () {},
+                onDeletePressed: () {
+                  dialog_function.showConfirmationDialog(
+                    context, 
+                    "Confirmación", 
+                    "Está por eliminar la cuenta ${store.name}", 
+                    () {deleteStore(context, store);}
+                  );
+                },
               )
             ]
           )
       ],
     );
   }
+
+  Future<void> deleteStore(BuildContext context, Store store) async {
+    dialog_function.showLoaderDialog(context);
+    final storeService = StoreService();
+    Data<String> result = await storeService.deleteStore(store);
+    if(context.mounted) dialog_function.closeLoaderDialog(context);
+    if (result.data == null) {
+      if (context.mounted) dialog_function.showInfoDialog(context, "Error", result.message);
+    } else {
+      reload();
+    }
+  }
+
 }

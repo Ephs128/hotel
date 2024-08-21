@@ -7,12 +7,18 @@ import 'package:hotel/screens/registers/cashbox/cashbox_form_screen.dart';
 import 'package:hotel/screens/registers/widgets/tables/cashboxes_table_widget.dart';
 import 'package:hotel/screens/widgets/loading_widget.dart';
 
+import 'package:hotel/screens/widgets/dialog_functions.dart' as dialog_function;
+
 class CashboxRegisterScreen extends StatefulWidget {
   final Function(Widget) changeScreenTo;
+  final String? withSuccessMessage;
+  final String? withErrorMessage;
 
   const CashboxRegisterScreen({
     super.key,
-    required this.changeScreenTo,
+    required this.changeScreenTo, 
+    this.withSuccessMessage, 
+    this.withErrorMessage,
   });
 
   @override
@@ -23,11 +29,23 @@ class _CashboxRegisterScreenState extends State<CashboxRegisterScreen> {
   List<Cashbox> cashboxes = [];
   bool isLoaded = false;
   Data<List<Cashbox>>? result;
+  bool firstCall = true;
   
   @override
   void initState() {
     super.initState();
     _fetchCashboxes();
+    if (widget.withSuccessMessage != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        dialog_function.showInfoDialog(context, "Operacion exitosa", widget.withSuccessMessage!);
+      });
+    } else {
+      if (widget.withErrorMessage != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          dialog_function.showInfoDialog(context, "Error", widget.withErrorMessage!);
+        });
+      }
+    }
   }
 
   Future<void> _fetchCashboxes() async {
@@ -61,6 +79,12 @@ class _CashboxRegisterScreenState extends State<CashboxRegisterScreen> {
           CashboxesTableWidget(
             cashboxList: cashboxes,
             changeScreenTo: widget.changeScreenTo,
+            reload: () {
+              setState(() {
+                isLoaded = false;
+              });
+              _fetchCashboxes();
+            },
           ),
         ],
       );
