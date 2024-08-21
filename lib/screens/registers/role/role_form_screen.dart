@@ -1,5 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:hotel/data/models/role_model.dart';
+import 'package:hotel/data/service/menu_service.dart';
+import 'package:hotel/data/service/role_service.dart';
 import 'package:hotel/screens/registers/role/permission_tree_data.dart';
 import 'package:hotel/screens/registers/role/roles_register_screen.dart';
 import 'package:hotel/screens/registers/widgets/checkbox_tree_widget.dart';
@@ -24,6 +26,11 @@ class RoleFormScreen extends StatefulWidget {
 
 class _RoleFormScreenState extends State<RoleFormScreen> {
   final GlobalKey<FormState> _rolesFormState = GlobalKey<FormState>();
+  final MenuService _menuService = MenuService();
+  final RoleService _roleService = RoleService();
+
+  bool _isLoaded = false;
+  String? errorMsg;
 
   final TextEditingController roleName = TextEditingController();
 
@@ -92,6 +99,18 @@ class _RoleFormScreenState extends State<RoleFormScreen> {
     ],
   );
 
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
+    final menuResult = await _menuService.getAllMenus();
+    if (menuResult.data != null) {
+      
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

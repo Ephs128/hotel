@@ -3,7 +3,6 @@ import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/models/store_model.dart';
 import 'package:hotel/data/service/store_service.dart';
 import 'package:hotel/screens/registers/store/store_register_screen.dart';
-import 'package:hotel/screens/registers/widgets/forms/footer_form_widget.dart';
 import 'package:hotel/screens/registers/widgets/forms/header_form_widget.dart';
 
 import 'package:hotel/screens/widgets/dialog_functions.dart' as dialog_function;

@@ -1,8 +1,8 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:hotel/data/models/data.dart';
-import 'package:hotel/data/models/store_model.dart';
-import 'package:hotel/data/service/store_service.dart';
-import 'package:hotel/screens/registers/store/store_form_screen.dart';
+import 'package:hotel/data/models/device_model.dart';
+import 'package:hotel/data/service/device_service.dart';
+import 'package:hotel/screens/registers/device/device_form_screen.dart';
 import 'package:hotel/screens/registers/widgets/tables/table_cells/actions_table_cell.dart';
 import 'package:hotel/screens/registers/widgets/tables/table_cells/header_table_cell.dart';
 import 'package:hotel/screens/registers/widgets/tables/table_cells/normal_table_cell.dart';
@@ -10,16 +10,16 @@ import 'package:hotel/screens/registers/widgets/tables/table_cells/state_table_c
 
 import 'package:hotel/screens/widgets/dialog_functions.dart' as dialog_function;
 
-class StoreTableWidget extends StatelessWidget {
-  final List<Store> storeList;
+class DevicesTableWidget extends StatelessWidget {
+  final List<Device> deviceList;
   final Function(Widget) changeScreenTo;
   final Function() reload;
-  
-  const StoreTableWidget({
-    super.key,
-    required this.storeList, 
-    required this.changeScreenTo,
-    required this.reload, 
+
+  const DevicesTableWidget({
+    super.key, 
+    required this.deviceList, 
+    required this.changeScreenTo, 
+    required this.reload,
   });
 
   @override
@@ -29,24 +29,36 @@ class StoreTableWidget extends StatelessWidget {
       columnWidths: const {
         0: FlexColumnWidth(),
         1: FlexColumnWidth(),
-        2: FixedColumnWidth(220),
+        2: FlexColumnWidth(),
+        3: FlexColumnWidth(),
+        4: FlexColumnWidth(),
+        5: FlexColumnWidth(),
+        6: FixedColumnWidth(220),
       },
       children: [
         TableRow(
           decoration: BoxDecoration(color: Colors.grey[120]),
           children: const [
             HeaderTableCell(text: "Nombre"),
+            HeaderTableCell(text: "Posición"),
+            HeaderTableCell(text: "Código"),
+            HeaderTableCell(text: "Serie"),
+            HeaderTableCell(text: "Tipo"),
             HeaderTableCell(text: "Estado"),
             HeaderTableCell(text: "Acciones"),
           ],
         ),
-        for (Store store in storeList)
+        for (Device device in deviceList)
           TableRow(
             decoration: BoxDecoration( color: Colors.grey[20], ),
             children: [
-              NormalTableCell(child: Text(store.name)),
+              NormalTableCell(child: Text(device.name)),
+              NormalTableCell(child: Text(device.position)),
+              NormalTableCell(child: Text(device.productCode)),
+              NormalTableCell(child: Text(device.serie)),
+              NormalTableCell(child: Text(device.type.toString())),
               StateTableCell(
-                status: store.state, 
+                status: device.state, 
                 activeLabel: "Activo", 
                 activeColor: Colors.green.lightest, 
                 inactiveColor: Colors.grey[110],
@@ -54,18 +66,18 @@ class StoreTableWidget extends StatelessWidget {
               ActionsTableCell(
                 onSeePressed: () {
                   changeScreenTo(
-                    StoreFormScreen(
-                      store: store,
+                    DeviceFormScreen(
+                      changeScreenTo: changeScreenTo,
                       readOnly: true,
-                      changeScreenTo: changeScreenTo
+                      device: device,
                     )
                   );
                 },
                 onEditPressed: () {
                   changeScreenTo(
-                    StoreFormScreen(
-                      store: store,
-                      changeScreenTo: changeScreenTo
+                    DeviceFormScreen(
+                      changeScreenTo: changeScreenTo,
+                      device: device,
                     )
                   );
                 },
@@ -73,21 +85,21 @@ class StoreTableWidget extends StatelessWidget {
                   dialog_function.showConfirmationDialog(
                     context, 
                     "Confirmación", 
-                    "Está por eliminar el almacen ${store.name}", 
-                    () {deleteStore(context, store);}
+                    "Está por eliminar el dispositivo ${device.name}", 
+                    () {deleteDevice(context, device);}
                   );
                 },
-              )
-            ]
+              ),
+            ],
           )
       ],
     );
   }
 
-  Future<void> deleteStore(BuildContext context, Store store) async {
+  Future<void> deleteDevice(BuildContext context, Device device) async {
     dialog_function.showLoaderDialog(context);
-    final storeService = StoreService();
-    Data<String> result = await storeService.deleteStore(store);
+    final storeService = DeviceService();
+    Data<String> result = await storeService.deleteDevice(device);
     if(context.mounted) dialog_function.closeLoaderDialog(context);
     if (result.data == null) {
       if (context.mounted) dialog_function.showInfoDialog(context, "Error", result.message);

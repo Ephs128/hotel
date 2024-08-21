@@ -1,6 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:hotel/screens/registers/cashbox/cashbox_page_manager.dart';
-import 'package:hotel/screens/registers/devices_register_screen.dart';
+import 'package:hotel/screens/registers/device/device_page_manager.dart';
 import 'package:hotel/screens/registers/role/role_page_manager.dart';
 import 'package:hotel/screens/registers/rooms_register_screen.dart';
 import 'package:hotel/screens/registers/store/store_page_manager.dart';
@@ -51,7 +51,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             PaneItem(
               icon: const Icon(FluentIcons.devices2),
               title: const Text("Dispositivos"),
-              body: const DevicesRegisterScreen(),
+              body: const DevicePageManager(),
             ),
           ],
           displayMode: PaneDisplayMode.top,
