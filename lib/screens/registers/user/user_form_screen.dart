@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:hotel/data/models/cashbox_model.dart';
+import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/models/role_model.dart';
 import 'package:hotel/data/models/store_model.dart';
 import 'package:hotel/data/models/user_cashbox_model.dart';
@@ -9,12 +10,14 @@ import 'package:hotel/data/models/user_store_model.dart';
 import 'package:hotel/data/service/cashbox_service.dart';
 import 'package:hotel/data/service/role_service.dart';
 import 'package:hotel/data/service/store_service.dart';
+import 'package:hotel/data/service/user_service.dart';
 import 'package:hotel/screens/error_screen.dart';
 import 'package:hotel/screens/registers/user/users_register_screen.dart';
 import 'package:hotel/screens/registers/widgets/checkbox_group.dart';
-import 'package:hotel/screens/registers/widgets/forms/footer_form_widget.dart';
 import 'package:hotel/screens/registers/widgets/forms/header_form_widget.dart';
 import 'package:hotel/screens/widgets/loading_widget.dart';
+
+import 'package:hotel/screens/widgets/dialog_functions.dart' as dialog_function;
 
 class UserFormScreen extends StatefulWidget {
   final Function(Widget) changeScreenTo;
@@ -47,12 +50,15 @@ class _UserFormScreenState extends State<UserFormScreen> {
 
   final RegExp _emailRegExp = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',);
 
+  final userService = UserService();
+
   List<Role> roleList = [];
   Role? selectedRole;
   Map<Store, bool> storeMap = {};
   Map<Cashbox, bool> cashboxMap = {};
   bool _isLoaded = false;
   String? errorMsg;
+  
   @override
   void initState() {
     super.initState();
@@ -108,7 +114,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
     if (value == null || value.isEmpty) {
       errorMsg = 'Por favor, ingresa un cedula de identidad';
     } else {
-      int length = errorMsg!.length;
+      int length = value.length;
       if (length < 7) {
         errorMsg = 'La cedula de identidad debe tener 7 digitos';
       } else if (length > 8) {
@@ -121,7 +127,29 @@ class _UserFormScreenState extends State<UserFormScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoaded){
-      final String title = _createTitle();
+      late String title;
+      final Map<String, void Function()> actionsList = {};
+      switch(_formType()) {
+        case 0:
+          title = "Nuevo usuario";
+          actionsList["Crear Nuevo"] = () {
+            if (_userFormState.currentState!.validate()){
+              createFunction(context);
+            }
+          };
+          actionsList["Cancelar"] = () => backFunction();
+        case 1:
+          title = "Ver usuario";
+          actionsList["Volver"] = () => backFunction();
+        case 2:
+          title = "Modificar usuario";
+          actionsList["Guardar cambios"] = () {
+            if (_userFormState.currentState!.validate()){
+              updateFunction(context);
+            }
+          };
+          actionsList["Cancelar"] = () => backFunction();
+      }
       if (widget.user != null) {
         name.text = widget.user!.person.name;
         firstLastname.text = widget.user!.person.firstLastname;
@@ -321,11 +349,15 @@ class _UserFormScreenState extends State<UserFormScreen> {
                   ],
                 ),
                 const SizedBox(height: 30,),
-                FooterFormWidget(
-                  submit: () {}, 
-                  cancel: () => backFunction(),
-                  readOnly: widget.readOnly,
-                )
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [ for(String name in actionsList.keys) 
+                    FilledButton(
+                      onPressed: actionsList[name],
+                      child: Text(name), 
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -361,16 +393,76 @@ class _UserFormScreenState extends State<UserFormScreen> {
     }
   }
 
-  String _createTitle() {
-    String title = "Nuevo ";
-      if(widget.user != null) {
-        if (widget.readOnly) {
-          title = "Ver ";
-        } else {
-          title = "Editar ";
-        }
+  Future<void> createFunction(BuildContext context) async {
+    dialog_function.showLoaderDialog(context);
+    List<Cashbox> listCashboxes = [];
+    List<Store> listStores = [];
+    for (Cashbox cashbox in cashboxMap.keys) {
+      if (cashboxMap[cashbox]!) {
+        listCashboxes.add(cashbox);
       }
-      title += "usuario";
-      return title;
+    }
+    for (Store store in storeMap.keys) {
+      if (storeMap[store]!) {
+        listStores.add(store);
+      }
+    }
+    Data<String> result = await userService.createUser(
+      name.text, 
+      firstLastname.text, 
+      secondLastname.text, 
+      identityDocumentation.text, 
+      phone.text, 
+      email.text, 
+      address.text, 
+      user.text, 
+      password.text, 
+      "", 
+      "", 
+      selectedRole!, 
+      listCashboxes, 
+      listStores
+    );
+    if (context.mounted) dialog_function.closeLoaderDialog(context);
+
+    if (result.data == null) {
+      if (context.mounted) dialog_function.showInfoDialog(context, "Error", result.message);
+    } else {
+      widget.changeScreenTo(
+        UsersRegisterScreen(
+          changeScreenTo: widget.changeScreenTo,
+          withSuccessMessage: result.data,
+        )
+      );
+    }
+  }
+
+  Future<void> updateFunction(BuildContext context) async {
+    // Store store = Store(
+    //   id: widget.store!.id, 
+    //   name: name.text, 
+    //   state: widget.store!.state
+    // );
+    // dialog_function.showLoaderDialog(context);
+    // Data<String> result = await storeService.updateStore(store);
+    // if (context.mounted) dialog_function.closeLoaderDialog(context);
+
+    // if (result.data == null) {
+    //   if (context.mounted) dialog_function.showInfoDialog(context, "Error", result.message);
+    // } else {
+    //   if (context.mounted) dialog_function.showInfoDialog(context, "Operación exitosa", result.data!);
+    // }
+  }
+
+  int _formType() {
+    int type = 0;
+    if(widget.user != null) {
+      if (widget.readOnly) {
+        type = 1;
+      } else {
+        type = 2;
+      }
+    }
+    return type;
   }
 }

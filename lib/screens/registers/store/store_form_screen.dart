@@ -44,7 +44,7 @@ class _StoreFormScreenState extends State<StoreFormScreen> {
     }
     switch(_formType()) {
       case 0:
-        title = "Nuevo alamacén";
+        title = "Nuevo almacén";
         actionsList["Crear Nuevo"] = () {
           if (_storeFormState.currentState!.validate()){
             createFunction(context);
@@ -52,10 +52,10 @@ class _StoreFormScreenState extends State<StoreFormScreen> {
         };
         actionsList["Cancelar"] = () => backFunction();
       case 1:
-        title = "Ver alamacén";
+        title = "Ver almacén";
         actionsList["Volver"] = () => backFunction();
       case 2:
-        title = "Modificar alamacén";
+        title = "Modificar almacén";
         actionsList["Guardar cambios"] = () {
           if (_storeFormState.currentState!.validate()){
             updateFunction(context);

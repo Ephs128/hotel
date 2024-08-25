@@ -10,11 +10,13 @@ import 'package:hotel/screens/registers/widgets/tables/table_constants.dart' as 
 class UsersTable extends StatelessWidget {
   final List<User> usersList;
   final Function(Widget) changeScreenTo;
+  final Function() reload;
 
   const UsersTable({
     super.key, 
     required this.usersList, 
     required this.changeScreenTo,
+    required this.reload,
   });
 
   @override
@@ -70,6 +72,7 @@ class UsersTable extends StatelessWidget {
                     )
                   );
                 },
+                onDeletePressed: () {},
               ),
             ]
           ),

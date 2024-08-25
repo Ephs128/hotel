@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/service/login_service.dart';
 import 'package:hotel/screens/home_screen.dart';
@@ -15,7 +14,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> _loginFormState = GlobalKey<FormState>();
-  final storage = const FlutterSecureStorage();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   String message = "";

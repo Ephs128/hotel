@@ -7,13 +7,19 @@ import 'package:hotel/screens/registers/user/user_form_screen.dart';
 import 'package:hotel/screens/registers/widgets/tables/users_table.dart';
 import 'package:hotel/screens/widgets/loading_widget.dart';
 
+import 'package:hotel/screens/widgets/dialog_functions.dart' as dialog_function;
+
 class UsersRegisterScreen extends StatefulWidget {
   final Function(Widget) changeScreenTo;
-  // List<User> usersList;
+  final String? withSuccessMessage;
+  final String? withErrorMessage;
+  
 
   const UsersRegisterScreen({
     super.key, 
-    required this.changeScreenTo, 
+    required this.changeScreenTo,
+    this.withSuccessMessage,
+    this.withErrorMessage,
   });
 
   @override
@@ -29,6 +35,17 @@ class _UsersRegisterScreenState extends State<UsersRegisterScreen> {
   void initState() {
     super.initState();
     _fetchUsers();
+    if (widget.withSuccessMessage != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        dialog_function.showInfoDialog(context, "Operacion exitosa", widget.withSuccessMessage!);
+      });
+    } else {
+      if (widget.withErrorMessage != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          dialog_function.showInfoDialog(context, "Error", widget.withErrorMessage!);
+        });
+      }
+    }
   }
 
   Future<void> _fetchUsers() async {
@@ -65,6 +82,12 @@ class _UsersRegisterScreenState extends State<UsersRegisterScreen> {
             UsersTable(
               usersList: _users,
               changeScreenTo: widget.changeScreenTo,
+              reload: () {
+                setState(() {
+                  _isLoaded = false;
+                });
+                _fetchUsers();
+              },
             ),
           ],
         ),

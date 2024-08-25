@@ -59,6 +59,8 @@ class User {
     "registerUser": registerUser,
     "person": person.toJson(),
     "rol": role.toJson(),
+    "userStores": stores.map((store) => store.toJson()).toList(),
+    "userCashboxes": cashboxes.map((cashbox) => cashbox.toJson()).toList(),
   };
     
 }
