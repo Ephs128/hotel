@@ -4,8 +4,8 @@ import 'package:hotel/data/models/role_model.dart';
 import 'package:hotel/data/service/role_service.dart';
 import 'package:hotel/screens/error_screen.dart';
 import 'package:hotel/screens/registers/role/role_form_screen.dart';
-import 'package:hotel/screens/registers/widgets/tables/roles_table_widget.dart';
-import 'package:hotel/screens/widgets/loading_widget.dart';
+import 'package:hotel/widgets/tables/roles_table_widget.dart';
+import 'package:hotel/widgets/loading_widget.dart';
 
 class RolesRegisterScreen extends StatefulWidget {
   final Function(Widget) changeScreenTo;

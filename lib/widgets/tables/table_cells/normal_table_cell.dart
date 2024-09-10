@@ -1,5 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:hotel/screens/registers/widgets/tables/table_constants.dart' as constants;
+import 'package:hotel/widgets/tables/table_constants.dart' as constants;
 
 class NormalTableCell extends StatelessWidget {
   final Widget child;

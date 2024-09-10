@@ -49,7 +49,7 @@ class StoreApi {
         'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
-        "storeName": storeName,
+        "nombreAlmacen": storeName,
       }),
     );
     final jsonData = json.decode(response.body) as Map<String, dynamic>;

@@ -2,7 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:hotel/data/stream_socket.dart';
 import 'package:hotel/screens/products/products_screen.dart';
 import 'package:hotel/screens/registers/settings_screen.dart';
-import 'package:hotel/screens/room/rooms_screen.dart';
+import 'package:hotel/screens/room/rooms_page_manager.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
           PaneItem(
             icon: const Icon(FluentIcons.home_solid),
             title: const Text("Habitaciones"),
-            body: const RoomsScreen(),
+            body: const RoomsPageManager(),
           ),
           PaneItem(
             icon: const Icon(FluentIcons.shop),

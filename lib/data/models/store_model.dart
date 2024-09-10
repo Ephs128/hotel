@@ -10,15 +10,15 @@ class Store {
   });
 
   factory Store.fromJson(Map<String, dynamic> json) => Store(
-    id: json["idStore"],
-    name: json["storeName"],
-    state: json["state"] == 1,
+    id: json["idAlmacen"],
+    name: json["nombreAlmacen"],
+    state: json["estado"] == 1,
   );
 
   Map<String, dynamic> toJson() => {
-    "idStore": id,
-    "storeName": name,
-    "state": state ? 1 : 0,
+    "idAlmacen": id,
+    "nombreAlmacen": name,
+    "estado": state ? 1 : 0,
   };
 
   @override

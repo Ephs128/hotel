@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hotel/data/models/cashbox_model.dart';
@@ -69,21 +68,21 @@ class UserApi {
         'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
-        "name": name,
-        "firstLastname": firstLastname,
-        "secondLastname": secondLastname,
-        "dni": dni,
-        "phone": phone,
-        "email": email,
-        "address": address,
-        "user": {
-            "user": user,
-            "password": password,
-            "photo": photo,
-            "thumbnail": thumbnail,
-            "idRole": role.id,
-            "userCashboxes": listCashboxes.map((cashbox)=>{"idCashbox": cashbox.id}).toList(),
-            "userStores": listStores.map((store) => {"idStore": store.id}).toList()
+        "nombre": name,
+        "apellidoPaterno": firstLastname,
+        "apellidoMaterno": secondLastname,
+        "ci": dni,
+        "telefono": phone,
+        "correoElectronico": email,
+        "direccion": address,
+        "usuario": {
+            "usuario": user,
+            "contrasenia": password,
+            "foto": photo,
+            "miniatura": thumbnail,
+            "idRol": role.id,
+            "usuarioCajas": listCashboxes.map((cashbox)=>{"idCaja": cashbox.id}).toList(),
+            "usuarioAlmacenes": listStores.map((store) => {"idAlmacen": store.id}).toList()
         },
       }),
     );

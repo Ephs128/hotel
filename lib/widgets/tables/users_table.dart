@@ -1,11 +1,11 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:hotel/data/models/user_model.dart';
 import 'package:hotel/screens/registers/user/user_form_screen.dart';
-import 'package:hotel/screens/registers/widgets/tables/table_cells/actions_table_cell.dart';
-import 'package:hotel/screens/registers/widgets/tables/table_cells/header_table_cell.dart';
-import 'package:hotel/screens/registers/widgets/tables/table_cells/normal_table_cell.dart';
-import 'package:hotel/screens/registers/widgets/tables/table_cells/state_table_cell.dart';
-import 'package:hotel/screens/registers/widgets/tables/table_constants.dart' as constants;
+import 'package:hotel/widgets/tables/table_cells/actions_table_cell.dart';
+import 'package:hotel/widgets/tables/table_cells/header_table_cell.dart';
+import 'package:hotel/widgets/tables/table_cells/normal_table_cell.dart';
+import 'package:hotel/widgets/tables/table_cells/state_table_cell.dart';
+import 'package:hotel/widgets/tables/table_constants.dart' as constants;
 
 class UsersTable extends StatelessWidget {
   final List<User> usersList;

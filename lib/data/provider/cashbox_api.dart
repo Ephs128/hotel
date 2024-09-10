@@ -48,10 +48,10 @@ class CashboxApi {
         'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
-        "cashboxName": cashboxName,
-        if (amount != null) "amount": amount,
-        if (virtualAmount != null) "virtualAmount": virtualAmount,
-        if (numberAccount != null) "numberAccount": numberAccount,
+        "nombreCaja": cashboxName,
+        if (amount != null) "monto": amount,
+        if (virtualAmount != null) "montoVirtual": virtualAmount,
+        if (numberAccount != null) "numeroCuenta": numberAccount,
       }),
     );
     final jsonData = json.decode(response.body) as Map<String, dynamic>;

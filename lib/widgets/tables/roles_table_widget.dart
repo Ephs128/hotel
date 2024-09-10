@@ -1,10 +1,10 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:hotel/data/models/role_model.dart';
 import 'package:hotel/screens/registers/role/role_form_screen.dart';
-import 'package:hotel/screens/registers/widgets/tables/table_cells/actions_table_cell.dart';
-import 'package:hotel/screens/registers/widgets/tables/table_cells/header_table_cell.dart';
-import 'package:hotel/screens/registers/widgets/tables/table_cells/normal_table_cell.dart';
-import 'package:hotel/screens/registers/widgets/tables/table_cells/state_table_cell.dart';
+import 'package:hotel/widgets/tables/table_cells/actions_table_cell.dart';
+import 'package:hotel/widgets/tables/table_cells/header_table_cell.dart';
+import 'package:hotel/widgets/tables/table_cells/normal_table_cell.dart';
+import 'package:hotel/widgets/tables/table_cells/state_table_cell.dart';
 
 class RolesTableWidget extends StatelessWidget {
   final List<Role> roleList;

@@ -3,9 +3,9 @@ import 'package:hotel/data/models/cashbox_model.dart';
 import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/service/cashbox_service.dart';
 import 'package:hotel/screens/registers/cashbox/cashbox_register_screen.dart';
-import 'package:hotel/screens/registers/widgets/forms/header_form_widget.dart';
+import 'package:hotel/widgets/forms/header_form_widget.dart';
 
-import 'package:hotel/screens/widgets/dialog_functions.dart' as dialog_function;
+import 'package:hotel/widgets/dialog_functions.dart' as dialog_function;
 
 class CashboxFormScreen extends StatefulWidget {
   final Function(Widget) changeScreenTo;

@@ -16,21 +16,21 @@ class Cashbox {
   });
 
   factory Cashbox.fromJson(Map<String, dynamic> json) => Cashbox(
-    id: json["idCashbox"],
-    name: json["cashboxName"],
-    amount: json["amount"],
-    virtualAmount: json["virtualAmount"],
-    numberAccount: json["numberAccount"],
-    state: json["state"] == 1,
+    id: json["idCaja"],
+    name: json["nombreCaja"],
+    amount: json["monto"],
+    virtualAmount: json["montoVirtual"],
+    numberAccount: json["numeroCuenta"],
+    state: json["estado"] == 1,
   );
 
   Map<String, dynamic> toJson() => {
-    "idCashbox": id,
-    "cashboxName": name,
-    "amount": amount,
-    "virtualAmount": virtualAmount,
-    "numberAccount": numberAccount,
-    "state": state ? 1 : 0,
+    "idCaja": id,
+    "nombreCaja": name,
+    "monto": amount,
+    "montoVirtual": virtualAmount,
+    "numeroCuenta": numberAccount,
+    "estado": state ? 1 : 0,
   };
 
   @override

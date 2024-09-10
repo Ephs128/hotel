@@ -13,17 +13,17 @@ class UserStore {
   });
 
   factory UserStore.fromJson(Map<String, dynamic> json) => UserStore(
-    id: json["idUserStore"], 
-    state: json["state"] == 1, 
-    idUser: json["idUser"], 
-    idStore: json["idStore"],
+    id: json["idUsuarioAlmacen"], 
+    state: json["estado"] == 1, 
+    idUser: json["idUsuario"], 
+    idStore: json["idAlmacen"],
   );
 
   Map<String, dynamic> toJson() => {
-    "idUserStore": id,
-    "state": state ? 1 : 0,
-    "idUser": idUser,
-    "idStore": idStore,
+    "idUsuarioAlmacen": id,
+    "estado": state ? 1 : 0,
+    "idUsuario": idUser,
+    "idAlmacen": idStore,
   };
   
 }

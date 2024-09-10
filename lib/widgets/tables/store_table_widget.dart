@@ -3,12 +3,12 @@ import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/models/store_model.dart';
 import 'package:hotel/data/service/store_service.dart';
 import 'package:hotel/screens/registers/store/store_form_screen.dart';
-import 'package:hotel/screens/registers/widgets/tables/table_cells/actions_table_cell.dart';
-import 'package:hotel/screens/registers/widgets/tables/table_cells/header_table_cell.dart';
-import 'package:hotel/screens/registers/widgets/tables/table_cells/normal_table_cell.dart';
-import 'package:hotel/screens/registers/widgets/tables/table_cells/state_table_cell.dart';
+import 'package:hotel/widgets/tables/table_cells/actions_table_cell.dart';
+import 'package:hotel/widgets/tables/table_cells/header_table_cell.dart';
+import 'package:hotel/widgets/tables/table_cells/normal_table_cell.dart';
+import 'package:hotel/widgets/tables/table_cells/state_table_cell.dart';
 
-import 'package:hotel/screens/widgets/dialog_functions.dart' as dialog_function;
+import 'package:hotel/widgets/dialog_functions.dart' as dialog_function;
 
 class StoreTableWidget extends StatelessWidget {
   final List<Store> storeList;

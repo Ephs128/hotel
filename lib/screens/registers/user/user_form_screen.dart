@@ -13,11 +13,11 @@ import 'package:hotel/data/service/store_service.dart';
 import 'package:hotel/data/service/user_service.dart';
 import 'package:hotel/screens/error_screen.dart';
 import 'package:hotel/screens/registers/user/users_register_screen.dart';
-import 'package:hotel/screens/registers/widgets/checkbox_group.dart';
-import 'package:hotel/screens/registers/widgets/forms/header_form_widget.dart';
-import 'package:hotel/screens/widgets/loading_widget.dart';
+import 'package:hotel/widgets/checkbox_group.dart';
+import 'package:hotel/widgets/forms/header_form_widget.dart';
+import 'package:hotel/widgets/loading_widget.dart';
 
-import 'package:hotel/screens/widgets/dialog_functions.dart' as dialog_function;
+import 'package:hotel/widgets/dialog_functions.dart' as dialog_function;
 
 class UserFormScreen extends StatefulWidget {
   final Function(Widget) changeScreenTo;

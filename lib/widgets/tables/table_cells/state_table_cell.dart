@@ -1,5 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:hotel/screens/registers/widgets/tables/table_cells/normal_table_cell.dart';
+import 'package:hotel/widgets/tables/table_cells/normal_table_cell.dart';
 
 class StateTableCell extends StatelessWidget {
   

@@ -3,9 +3,9 @@ import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/models/device_model.dart';
 import 'package:hotel/data/service/device_service.dart';
 import 'package:hotel/screens/registers/device/device_register_screen.dart';
-import 'package:hotel/screens/registers/widgets/forms/header_form_widget.dart';
+import 'package:hotel/widgets/forms/header_form_widget.dart';
 
-import 'package:hotel/screens/widgets/dialog_functions.dart' as dialog_function;
+import 'package:hotel/widgets/dialog_functions.dart' as dialog_function;
 
 class DeviceFormScreen extends StatefulWidget {
   final Function(Widget) changeScreenTo;
@@ -30,9 +30,11 @@ class _DeviceFormScreenState extends State<DeviceFormScreen> {
   final TextEditingController position = TextEditingController();
   final TextEditingController code = TextEditingController();
   final TextEditingController serie = TextEditingController();
-  final TextEditingController type = TextEditingController();
 
   final deviceService = DeviceService();
+
+  int functionType = 0;
+  int selectedType = 0;
 
   @override
   void dispose() {
@@ -40,7 +42,6 @@ class _DeviceFormScreenState extends State<DeviceFormScreen> {
     position.dispose();
     code.dispose();
     serie.dispose();
-    type.dispose();
 
     super.dispose();
   }
@@ -54,7 +55,8 @@ class _DeviceFormScreenState extends State<DeviceFormScreen> {
       position.text = widget.device!.position;
       code.text = widget.device!.productCode;
       serie.text = widget.device!.serie;
-      type.text = widget.device!.type.toString();
+      selectedType = widget.device!.type;
+      functionType = widget.device!.pulse ? 0 : 1;
     }
     switch(_formType()) {
       case 0:
@@ -134,10 +136,61 @@ class _DeviceFormScreenState extends State<DeviceFormScreen> {
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 48),
             child: InfoLabel(
               label: "Tipo",
-              child: TextFormBox(
-                readOnly: widget.readOnly,
-                controller: type,
-                expands: false,
+              child: ComboBox<int>(
+                isExpanded: true,
+                value: selectedType,
+                items: const [
+                  ComboBoxItem<int>(
+                    value: 0,
+                    child: Text("Cerradura"),
+                  ),
+                  ComboBoxItem<int>(
+                    value: 1,
+                    child: Text("Luz"),
+                  ),
+                  ComboBoxItem<int>(
+                    value: 2,
+                    child: Text("Jacuzzi"),
+                  ),
+                  ComboBoxItem<int>(
+                    value: 3,
+                    child: Text("Ventilación"),
+                  ),
+                  ComboBoxItem<int>(
+                    value: 4,
+                    child: Text("Puerta"),
+                  ),
+                ],
+                onChanged: widget.readOnly ? null : (value) {
+                  setState(() {
+                    selectedType = value ?? 0;
+                  });
+                },
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 48),
+            child: InfoLabel(
+              label: "Método de funcionamiento",
+              child: ComboBox<int>(
+                isExpanded: true,
+                value: functionType,
+                items: const [
+                  ComboBoxItem<int>(
+                    value: 0,
+                    child: Text("Pulso"),
+                  ),
+                  ComboBoxItem<int>(
+                    value: 1,
+                    child: Text("Automatico"),
+                  ),
+                ],
+                onChanged: widget.readOnly ? null : (value) {
+                  setState(() {
+                    functionType = value ?? 0;
+                  });
+                },
               ),
             ),
           ),
@@ -168,8 +221,9 @@ class _DeviceFormScreenState extends State<DeviceFormScreen> {
       position.text,
       code.text,
       serie.text,
-      int.parse(type.text),
-      false
+      selectedType,
+      functionType == 1,
+      functionType == 0
     );
     if (context.mounted) dialog_function.closeLoaderDialog(context);
 
@@ -192,13 +246,11 @@ class _DeviceFormScreenState extends State<DeviceFormScreen> {
       position: position.text,
       productCode: code.text,
       serie: serie.text,
-      type: int.parse(type.text),
+      type: widget.device!.type,
       activate: widget.device!.activate, 
-      state: widget.device!.state,
-      purchasePrice: widget.device!.purchasePrice,
-      salePrice: widget.device!.salePrice,
-      decription: widget.device!.decription,
-      measure: widget.device!.measure
+      automatic: widget.device!.automatic, 
+      pulse: widget.device!.pulse,
+      state: widget.device!.state
     );
     dialog_function.showLoaderDialog(context);
     Data<String> result = await deviceService.updateDevice(device);

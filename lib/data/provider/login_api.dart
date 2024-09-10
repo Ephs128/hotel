@@ -18,8 +18,8 @@ class LoginApi {
         'Accept': 'application/json',
       },
       body: jsonEncode({
-        "user": user,
-        "password": password
+        "usuario": user,
+        "contrasenia": password
       }),
     );
     final postResult = json.decode(response.body) as Map<String, dynamic>;

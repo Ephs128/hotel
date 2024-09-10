@@ -10,15 +10,15 @@ class Role {
   });
 
   factory Role.fromJson(Map<String, dynamic> json) => Role(
-    id: json["idRole"],
-    role: json["role"],
-    state: json["state"] == 1,
+    id: json["idRol"],
+    role: json["rol"],
+    state: json["estado"] == 1,
   );
 
   Map<String, dynamic> toJson() => {
-    "idRole": id,
-    "role": role,
-    "state": state ? 1 : 0,
+    "idRol": id,
+    "rol": role,
+    "estado": state ? 1 : 0,
   };
 
   @override

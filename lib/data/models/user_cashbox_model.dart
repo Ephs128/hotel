@@ -13,17 +13,17 @@ class UserCashbox {
   });
 
   factory UserCashbox.fromJson(Map<String, dynamic> json) => UserCashbox(
-    id: json["idUserCashbox"], 
-    state: json["state"] == 1, 
-    idUser: json["idUser"], 
-    idCashbox: json["idCashbox"],
+    id: json["idUsuarioCaja"], 
+    state: json["estado"] == 1, 
+    idUser: json["idUsuario"], 
+    idCashbox: json["idCaja"],
   );
 
   Map<String, dynamic> toJson() => {
-    "idUserCashbox": id,
-    "state": state ? 1 : 0,
-    "idUser": idUser,
-    "idCashbox": idCashbox,
+    "idUsuarioCaja": id,
+    "estado": state ? 1 : 0,
+    "idUsuario": idUser,
+    "idCaja": idCashbox,
   };
   
 }

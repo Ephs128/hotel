@@ -2,7 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:hotel/screens/registers/cashbox/cashbox_page_manager.dart';
 import 'package:hotel/screens/registers/device/device_page_manager.dart';
 import 'package:hotel/screens/registers/role/role_page_manager.dart';
-import 'package:hotel/screens/registers/rooms_register_screen.dart';
+import 'package:hotel/screens/registers/room/room_page_manager.dart';
 import 'package:hotel/screens/registers/store/store_page_manager.dart';
 import 'package:hotel/screens/registers/user/user_page_manager.dart';
 
@@ -46,7 +46,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             PaneItem(
               icon: const Icon(FluentIcons.home),
               title: const Text("Habitaciones"),
-              body: const RoomsRegisterScreen(),
+              body: const RoomPageManager(),
             ),
             PaneItem(
               icon: const Icon(FluentIcons.devices2),

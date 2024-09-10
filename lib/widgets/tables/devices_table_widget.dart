@@ -3,12 +3,12 @@ import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/models/device_model.dart';
 import 'package:hotel/data/service/device_service.dart';
 import 'package:hotel/screens/registers/device/device_form_screen.dart';
-import 'package:hotel/screens/registers/widgets/tables/table_cells/actions_table_cell.dart';
-import 'package:hotel/screens/registers/widgets/tables/table_cells/header_table_cell.dart';
-import 'package:hotel/screens/registers/widgets/tables/table_cells/normal_table_cell.dart';
-import 'package:hotel/screens/registers/widgets/tables/table_cells/state_table_cell.dart';
+import 'package:hotel/widgets/tables/table_cells/actions_table_cell.dart';
+import 'package:hotel/widgets/tables/table_cells/header_table_cell.dart';
+import 'package:hotel/widgets/tables/table_cells/normal_table_cell.dart';
+import 'package:hotel/widgets/tables/table_cells/state_table_cell.dart';
 
-import 'package:hotel/screens/widgets/dialog_functions.dart' as dialog_function;
+import 'package:hotel/widgets/dialog_functions.dart' as dialog_function;
 
 class DevicesTableWidget extends StatelessWidget {
   final List<Device> deviceList;
@@ -57,7 +57,7 @@ class DevicesTableWidget extends StatelessWidget {
               NormalTableCell(child: Text(device.productCode)),
               NormalTableCell(child: Text(device.serie)),
               NormalTableCell(child: Text(device.type.toString())),
-              StateTableCell(
+              StateTableCell( 
                 status: device.state, 
                 activeLabel: "Activo", 
                 activeColor: Colors.green.lightest, 

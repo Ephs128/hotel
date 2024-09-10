@@ -8,8 +8,8 @@ class DeviceService {
     return _api.getAllDevices();
   }
 
-  Future<Data<String>> createDevice(String productName, String position, String productCode, String serie, int type, bool activate) async {
-    return _api.createDevice(productName, position, productCode, serie, type, activate);
+  Future<Data<String>> createDevice(String productName, String position, String productCode, String serie, int type, bool automatic, bool pulse) async {
+    return _api.createDevice(productName, position, productCode, serie, type, automatic, pulse);
   }
 
   Future<Data<String>> updateDevice(Device device) async {

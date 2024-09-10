@@ -4,13 +4,11 @@ import 'package:hotel/data/models/role_model.dart';
 import 'package:hotel/data/service/menu_service.dart';
 import 'package:hotel/data/service/role_service.dart';
 import 'package:hotel/screens/error_screen.dart';
-import 'package:hotel/screens/registers/role/permission_tree_data.dart';
 import 'package:hotel/screens/registers/role/roles_register_screen.dart';
-import 'package:hotel/screens/registers/widgets/checkbox_menu_widget.dart';
-import 'package:hotel/screens/registers/widgets/checkbox_tree_widget.dart';
-import 'package:hotel/screens/registers/widgets/forms/footer_form_widget.dart';
-import 'package:hotel/screens/registers/widgets/forms/header_form_widget.dart';
-import 'package:hotel/screens/widgets/loading_widget.dart';
+import 'package:hotel/widgets/checkbox_menu_widget.dart';
+import 'package:hotel/widgets/forms/footer_form_widget.dart';
+import 'package:hotel/widgets/forms/header_form_widget.dart';
+import 'package:hotel/widgets/loading_widget.dart';
 
 class RoleFormScreen extends StatefulWidget {
   final Function(Widget) changeScreenTo;
@@ -38,71 +36,6 @@ class _RoleFormScreenState extends State<RoleFormScreen> {
   String? errorMsg;
 
   final TextEditingController roleName = TextEditingController();
-
-  final ParentTreeData configurationData = ParentTreeData(
-    title: "Configuración", 
-    children: [
-      ChildTreeData(
-        title: "Usuario", 
-        children: [
-          ValueTreeData(data: "Crear usuario"),
-          ValueTreeData(data: "Modificar usuario"),
-          ValueTreeData(data: "Eliminar usuario"),
-        ],
-      ),
-      ChildTreeData(
-        title: "Rol", 
-        children: [
-          ValueTreeData(data: "Crear rol"),
-          ValueTreeData(data: "Modificar rol"),
-          ValueTreeData(data: "Eliminar rol"),
-        ],
-      ),
-    ],
-  );
-
-  final ParentTreeData cuentaData = ParentTreeData(
-    title: "Cuentas", 
-    children: [
-      ChildTreeData(
-        title: "Configuración", 
-        children: [
-          ValueTreeData(data: "Crear cuenta"),
-          ValueTreeData(data: "Modificar cuenta"),
-          ValueTreeData(data: "Eliminar cuenta"),
-        ],
-      ),
-      ChildTreeData(
-        title: "Movimientos cuentas", 
-        children: [
-          ValueTreeData(data: "Crear Movimiento"),
-          ValueTreeData(data: "Modificar Movimiento"),
-          ValueTreeData(data: "Eliminar Movimiento"),
-        ],
-      ),
-    ],
-  );
-
-  final ParentTreeData sellsData = ParentTreeData(
-    title: "Ventas", 
-    children: [
-      ChildTreeData(
-        title: "ventas", 
-        children: [
-          ValueTreeData(data: "Crear venta"),
-          ValueTreeData(data: "Anular venta"),
-          ValueTreeData(data: "Modificar venta"),
-          ValueTreeData(data: "Cobrar venta"),
-          ValueTreeData(data: "Confirmar venta"),
-          ValueTreeData(data: "Editar Fecha venta"),
-          ValueTreeData(data: "Agregar Nota venta"),
-          ValueTreeData(data: "Entregar venta"),
-          ValueTreeData(data: "Mostrar interno venta"),
-          ValueTreeData(data: "Mostrar chofer venta"),
-        ],
-      ),
-    ],
-  );
 
   @override
   void initState() {

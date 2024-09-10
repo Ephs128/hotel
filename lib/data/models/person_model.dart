@@ -20,25 +20,25 @@ class Person {
   });
   
   factory Person.fromJson(Map<String, dynamic> json) => Person(
-    id: json["idPerson"],
-    name: json["name"],
-    firstLastname: json["firstLastname"],
-    secondLastname: json["secondLastname"],
-    identityDocument: json["dni"],
-    phone: json["phone"],
-    email: json["email"],
-    address: json["address"],
+    id: json["idPersona"],
+    name: json["nombre"],
+    firstLastname: json["apellidoPaterno"],
+    secondLastname: json["apellidoMaterno"],
+    identityDocument: json["ci"],
+    phone: json["telefono"],
+    email: json["correoElectronico"],
+    address: json["direccion"],
   );
 
   Map<String, dynamic> toJson() => {
-    "idPerson": id,
-    "name": name,
-    "firstLastname": firstLastname,
-    "secondLastname": secondLastname,
+    "idPersona": id,
+    "nombre": name,
+    "apellidoPaterno": firstLastname,
+    "apellidoMaterno": secondLastname,
     "ci": identityDocument,
-    "phone": phone,
-    "email": email,
-    "address": address,
+    "telefono": phone,
+    "correoElectronico": email,
+    "dirección": address,
   };
 
   String getName() {

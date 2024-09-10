@@ -37,7 +37,7 @@ class DeviceApi {
     }
   } 
 
-  Future<Data<String>> createDevice(String productName, String position, String productCode, String serie, int type, bool activate) async {
+  Future<Data<String>> createDevice(String productName, String position, String productCode, String serie, int type, bool automatic, bool pulse) async {
     String token = await storage.read(key: "token") ?? "";
     var client = http.Client();
     var uri = Uri.parse('$baseURL/api/v1/devices/create');
@@ -49,12 +49,13 @@ class DeviceApi {
         'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
-        "productName": productName,
-        "position": position,
-        "productCode": productCode,
+        "nombreProducto": productName,
+        "posicion": position,
+        "codigoProducto": productCode,
         "serie": serie,
-        "type": type,
-        "activate": activate ? 1 : 0,
+        "tipo": type,
+        "automatico": automatic ? 1 : 0,
+        "pulso": pulse ? 1 : 0,
       }),
     );
     final jsonData = json.decode(response.body) as Map<String, dynamic>;
