@@ -1,13 +1,18 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'package:hotel/data/homeassistant.dart';
+import 'package:hotel/data/models/room_model.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:hotel/data/env.dart';
 
 class StreamSocket{
   final _socketResponse= StreamController<String>();
   final _homeassistant =  Homeassistant();
+  final void Function(Room) updater; 
   late IO.Socket _socket;
+
+  StreamSocket(this.updater) ;
 
   void Function(String) get addResponse => _socketResponse.sink.add;
 
@@ -35,12 +40,17 @@ class StreamSocket{
     _socket.onDisconnect((_) => log('disconnect'));
 
     _socket.on("CODE-HAB", (data) {
-      _callHomeAssistant();
       log(data.toString());
+      log((data is Map<String,dynamic>).toString());
+      // Map<String, dynamic> result = Map.castFrom(json.decode(data));
+      // final result = jsonDecode(data) as Map<String,dynamic>;
+      Room newRoom = Room.fromJson(data["habitacion"]);
+      updater(newRoom);
     });
   }
+  
 
-  void _callHomeAssistant() async {
-    await _homeassistant.turnOnSwitch("switch.tasmota_tasmota2");
-  }
+  // void _callHomeAssistant() async {
+  //   await _homeassistant.turnOnSwitch("switch.tasmota_tasmota2");
+  // }
 }
