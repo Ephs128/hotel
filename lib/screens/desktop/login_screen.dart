@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:hotel/data/models/data.dart';
+import 'package:hotel/data/models/login_model.dart';
 import 'package:hotel/data/service/login_service.dart';
 import 'package:hotel/screens/desktop/home_screen.dart';
 
@@ -30,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
     String password = _passwordController.text;
     
     final loginService = LoginService();
-    Data<String> result = await loginService.postLogin(user, password);
+    Data<Login> result = await loginService.postLogin(user, password);
     if (context.mounted) Navigator.pop(context);
 
     if (result.data == null) {
@@ -42,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (context.mounted) {
         Navigator.push(
           context,
-          FluentPageRoute(builder: (context) => const HomeScreen()),
+          FluentPageRoute(builder: (context) => HomeScreen(login: result.data!,)),
         );
       }
     }

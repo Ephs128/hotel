@@ -1,10 +1,17 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:hotel/data/models/login_model.dart';
 import 'package:hotel/screens/desktop/products/products_screen.dart';
 import 'package:hotel/screens/desktop/registers/settings_screen.dart';
 import 'package:hotel/screens/desktop/room/rooms_page_manager.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+
+  final Login login;
+  
+  const HomeScreen({
+    super.key, 
+    required this.login,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();

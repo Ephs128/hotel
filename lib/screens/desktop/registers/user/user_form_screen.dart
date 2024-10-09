@@ -151,14 +151,14 @@ class _UserFormScreenState extends State<UserFormScreen> {
           actionsList["Cancelar"] = () => backFunction();
       }
       if (widget.user != null) {
-        name.text = widget.user!.person.name;
-        firstLastname.text = widget.user!.person.firstLastname;
-        secondLastname.text = widget.user!.person.secondLastname ?? "";
-        identityDocumentation.text = widget.user!.person.identityDocument;
-        email.text = widget.user!.person.email;
+        name.text = widget.user!.person!.name;
+        firstLastname.text = widget.user!.person!.firstLastname;
+        secondLastname.text = widget.user!.person!.secondLastname ?? "";
+        identityDocumentation.text = widget.user!.person!.identityDocument;
+        email.text = widget.user!.person!.email;
         user.text = widget.user!.user;
-        phone.text = widget.user!.person.phone;
-        address.text = widget.user!.person.address;
+        phone.text = widget.user!.person!.phone;
+        address.text = widget.user!.person!.address;
         password.text = widget.user!.password;
         selectedRole = widget.user!.role;
         _updateMapBoolStore(storeMap, widget.user!.stores);

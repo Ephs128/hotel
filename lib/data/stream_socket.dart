@@ -40,8 +40,9 @@ class StreamSocket{
     _socket.onDisconnect((_) => log('disconnect'));
 
     _socket.on("CODE-HAB", (data) {
-      log(data.toString());
-      log((data is Map<String,dynamic>).toString());
+      log("response socket");
+      log("Is data json: ${(data is Map<String,dynamic>).toString()}");
+      log("Data: ${data.toString()}");
       // Map<String, dynamic> result = Map.castFrom(json.decode(data));
       // final result = jsonDecode(data) as Map<String,dynamic>;
       Room newRoom = Room.fromJson(data["habitacion"]);

@@ -11,12 +11,14 @@ class Product {
   final String? productCode;
   final String? serie;
   final int type;
-  final int activate;
+  int activate;
   final int? productTYpe;
   final int? idVenta;
   final int? tolerance;
+  final int? toleranceCharge;
   final int? toleranceOff;
-  final DateTime? time;
+  DateTime? time;
+  String? actualTime;
   final bool? automatic;
   final bool? pulse;
   final bool? selected;
@@ -25,9 +27,14 @@ class Product {
   final String? offUrl;
   final List<Compound> compounds;
   final String? price;
+  final int? idFee;
+  final int? idCategory;
   final Fee? fee;
   final List<Promo> promos;
   final DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
+  final int? idRoomState;
+   
+
   Product({
     required this.idProduct,
     required this.productName,
@@ -46,12 +53,17 @@ class Product {
     this.pulse,
     this.selected,
     required this.state,
+    this.price,
     this.onUrl,
     this.offUrl,
     required this.compounds,
-    this.price,
+    this.idFee,
+    this.idCategory,
     this.fee,
     required this.promos,
+    this.toleranceCharge,
+    this.actualTime,
+    this.idRoomState,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) { 
@@ -87,8 +99,13 @@ class Product {
       onUrl: json["onUrl"],
       offUrl: json["offUrl"],
       compounds: compoundList.map((jsonData) => Compound.fromJson(jsonData)).toList(),
+      idFee: json["idPrecio"],
+      idCategory: json["idCategoria"],
       fee: price,
       promos: promoList.map((jsonData) => Promo.fromJson(jsonData)).toList(),
+      toleranceCharge: json["toleranciaCobro"],
+      actualTime: json["horaActual"],
+      idRoomState: json["idEstadoHabitacion"],
     );
   }
 
@@ -110,12 +127,17 @@ class Product {
     if (pulse != null) "pulso":  pulse! ? 1 : 0,
     if (selected != null) "seleccionado":  selected! ? 1 : 0,
     "estado":  state ? 1 : 0,
+    if (price != null) "precio": price,
     if (onUrl != null) "onUrl": onUrl,
     if (offUrl != null) "offUrl": offUrl,
     "compuestos": compounds.map((compound) => compound.toJson()).toList(),
-    if (price != null) "tarifa": price,
+    if (idFee != null) "idPrecio": idFee,
+    if (idCategory != null) "idCategoria": idCategory,
     if (fee != null) "tarifa": fee!.toJson(),
     "promocionProductos": promos.map((promo) => promo.toJson()).toList(),
+    if (toleranceCharge != null) "toleranciaCobro": toleranceCharge,
+    if (actualTime != null) "horaActual": actualTime,
+    if (idRoomState != null) "idEstadoHabitacion": idRoomState,
   };
 
   @override

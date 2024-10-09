@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:hotel/data/models/data.dart';
+import 'package:hotel/data/models/product_cleanning_model.dart';
 import 'package:hotel/data/models/room_model.dart';
+import 'package:hotel/data/models/store_product_model.dart';
+import 'package:hotel/data/service/product_service.dart';
+import 'package:hotel/screens/mobile/error_view.dart';
+import 'package:hotel/screens/mobile/loading_view.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class RoomCleaningProductView extends StatefulWidget {
   
   final Room room;
+  final int cleanningProductsId;
+  final List<ProductCleanning> selectedProducts;
 
   const RoomCleaningProductView({
     super.key,
     required this.room,
+    required this.cleanningProductsId,
+    required this.selectedProducts,
   });
 
   @override
@@ -18,35 +28,45 @@ class RoomCleaningProductView extends StatefulWidget {
 class _RoomCleaningProductViewState extends State<RoomCleaningProductView> {
   bool _isLoading = false;
   bool _searching = false;
-  late List<String> filteredList;
+  late List<StoreProduct> filteredList;
   final TextEditingController _searchController = TextEditingController();
+  final Map<StoreProduct, int> productsCounter = {};
+
+  // api call
+  List<StoreProduct> _productsList = [];
+  bool _isLoaded = false;
+  Data<List<StoreProduct>>? _result;
+  final productService = ProductService();
   
-  final List<String> productsList = [
-    "Jabon",
-    "Shampoo",
-    "Dulces",
-    "producto 2",
-    "producto 1",
-    "producto 22",
-    "producto 23",
-    "producto 26",
-    "producto 7",
-    "producto 75",
-    "producto 12",
-    "producto 2",
-    "producto s",
-    "producto 87",
-    "producto 19",
-    "producto 64",
-    "producto 64",
-    "producto 64",
-    "producto 64",
-  ];
 
   @override
   void initState() {
     super.initState();
-    filteredList = productsList;
+    _fetchProducts();
+  }
+
+  Future<void> _fetchProducts() async {
+    _result = await productService.getAllProductsIn(1);
+    List<StoreProduct> auxList = _result!.data ?? [];
+    _productsList = auxList.where((product) => product.product.idCategory == widget.cleanningProductsId).toList();
+    for (StoreProduct product in _productsList) {
+      int cant = _findCantitySelectedProduct(product);
+      productsCounter[product] = cant;
+    }
+    setState(() {
+      _isLoaded = true;
+    });
+    filteredList = _productsList;
+  }
+
+  int _findCantitySelectedProduct(StoreProduct product) {
+    int cant = 0;
+    for(ProductCleanning selectedProduct in widget.selectedProducts) {
+      if (selectedProduct.productId == product.idProduct) {
+        cant = selectedProduct.cantity;
+      }
+    }
+    return cant;
   }
 
   Future<void> _search() async {
@@ -59,10 +79,10 @@ class _RoomCleaningProductViewState extends State<RoomCleaningProductView> {
 
     setState(() {
       _searchController.text.isEmpty ? 
-        filteredList = productsList
+        filteredList = _productsList
       :
-        filteredList = productsList
-            .where((element) => element
+        filteredList = _productsList
+            .where((element) => element.product.productName
                 .toLowerCase()
                 .contains(_searchController.text.toLowerCase()))
             .toList();
@@ -72,34 +92,28 @@ class _RoomCleaningProductViewState extends State<RoomCleaningProductView> {
 
   @override
   Widget build(BuildContext context) {
+    return 
+    !_isLoaded ? 
+        const LoadingView() : 
+    _result!.data == null ?
+      Scaffold(
+        appBar: AppBar(title: const Text("Productos"),),
+        body: ErrorView(message: _result!.message)
+      )  
+    : 
+      _mainContent();
+
+    
+  }
+
+  Widget _mainContent() {
     List<Widget> list = [];
     if (_searching ){
-      list = filteredList.map((product) {
-        return Row(
-          children: [
-            Text(product.toString()),
-            const Spacer(),
-            IconButton(onPressed: () {}, icon: Icon(MdiIcons.minusCircleOutline)),
-            const Text("0"),
-            IconButton(onPressed: () {}, icon: Icon(MdiIcons.plusCircleOutline)),
-          ],
-        );
-      }).toList();
+      list = filteredList.map(_createProductTile).toList();
     } else {
-      list.addAll(productsList.map((product) {
-        return Row(
-          children: [
-            Text(product.toString()),
-            const Spacer(),
-            IconButton(onPressed: () {}, icon: Icon(MdiIcons.minusCircleOutline)),
-            const Text("0"),
-            IconButton(onPressed: () {}, icon: Icon(MdiIcons.plusCircleOutline)),
-          ],
-        );
-      }).toList());
+      list = _productsList.map(_createProductTile).toList();
       list.add(const SizedBox(height: 70,));
     }
-
     return Scaffold(
       appBar: AppBar(
         title: _searching ? 
@@ -125,7 +139,7 @@ class _RoomCleaningProductViewState extends State<RoomCleaningProductView> {
             onPressed: () {
               setState(() {
                 _searching = true;
-                filteredList = productsList;
+                filteredList = _productsList;
               });
             },
             icon: Icon(MdiIcons.magnify),
@@ -149,9 +163,7 @@ class _RoomCleaningProductViewState extends State<RoomCleaningProductView> {
               color: Colors.white
             ),
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => _addSelectedProducts(),
         ),
       ),
       body: PopScope(
@@ -179,6 +191,59 @@ class _RoomCleaningProductViewState extends State<RoomCleaningProductView> {
         ),
       ),
     );
+  }
+
+  Widget _createProductTile(StoreProduct product) {
+    int cant = productsCounter[product]!;
+    TextStyle? boldTextStyle;
+    if(cant > 0) {
+      boldTextStyle = const TextStyle(fontWeight: FontWeight.bold);
+    }
+    return Row(
+      children: [
+        Text(product.product.productName.toString(), style: boldTextStyle,),
+        const Spacer(),
+        IconButton(onPressed: () => _decreaseCounter(product), icon: Icon(MdiIcons.minusCircleOutline)),
+        Text(cant.toString(), style: boldTextStyle,),
+        IconButton(onPressed: () => _increaseCounter(product), icon: Icon(MdiIcons.plusCircleOutline)),
+      ],
+    );
+  }
+
+  void _increaseCounter(StoreProduct product) {
+    int cant = productsCounter[product]! + 1;
+    setState(() {
+      productsCounter[product] = cant;
+    });
+  }
+
+  void _decreaseCounter(StoreProduct product) {
+    int cant = productsCounter[product]!;
+    if (cant > 0){
+      cant --;
+      setState(() {
+        productsCounter[product] = cant;
+      });
+    }
+  }
+
+  void _addSelectedProducts() {
+    setState(() {
+    widget.selectedProducts.clear();
+      for(StoreProduct product in _productsList) {
+        int cant = productsCounter[product]!;
+        if (cant > 0) {
+          widget.selectedProducts.add(
+            ProductCleanning(
+              productId: product.idProduct, 
+              productName: product.product.productName, 
+              cantity: cant, 
+            )
+          );
+        }
+      } 
+    });
+    Navigator.pop(context, widget.selectedProducts);
   }
 
   void _closeSearch() {

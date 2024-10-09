@@ -54,6 +54,40 @@ void showMessageDialog(
     );
   }
 
+  void showMessageDialogWithAction(
+  {
+    required BuildContext context,
+    String title = "Aviso", 
+    required String message,
+    required void Function() onDismissable,
+  }) {
+    showDialog(
+      context: context, 
+      builder: (BuildContext context) {
+        return PopScope(
+          onPopInvoked: (didpop) {
+            Navigator.of(context).pop();
+            onDismissable();
+          },
+          child: AlertDialog(
+            title: Text(title),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  onDismissable();
+                }, 
+                child: const Text("Cerrar")
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+
 void showLoaderDialog(BuildContext context) {
     AlertDialog alert = AlertDialog(
       content: Row(

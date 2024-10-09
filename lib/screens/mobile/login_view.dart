@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hotel/data/models/data.dart';
+import 'package:hotel/data/models/login_model.dart';
+import 'package:hotel/data/models/menu_model.dart';
 import 'package:hotel/data/service/login_service.dart';
+import 'package:hotel/screens/mobile/error_view.dart';
 import 'package:hotel/screens/mobile/rooms/rooms_view.dart';
 
 import 'package:hotel/screens/mobile/widgets/dialogs.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -23,7 +27,7 @@ class _LoginViewState extends State<LoginView> {
       String user = _nameController.text;
       String password = _passwordController.text;
       final loginService = LoginService();
-      Data<String> result = await loginService.postLogin(user, password);
+      Data<Login> result = await loginService.postLogin(user, password);
       
     if (context.mounted) closeLoaderDialog(context);
 
@@ -37,7 +41,7 @@ class _LoginViewState extends State<LoginView> {
       }
     } else {
       if (context.mounted) {
-        toHome(context);
+        toHome(context, result.data!);
       }
     }
   }
@@ -98,7 +102,30 @@ class _LoginViewState extends State<LoginView> {
     return null;
   }
 
-  void toHome(BuildContext context) {
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const RoomsView()));
+  void toHome(BuildContext context, Login login) {
+    Widget? view;
+    for(Menu menu in login.menus) {
+      switch(menu.menuCode) {
+        case Menu.mRoomCode:
+          view ??= RoomsView(
+            login: login,
+            menu: menu,
+          );
+      }
+      if(view != null) {
+        break;
+      }
+    }
+    Navigator.pushReplacement(
+      context, 
+      MaterialPageRoute(
+        builder: (context) => 
+          view ?? 
+          const ErrorView(
+            message: "No tiene permisos", 
+            description: "Los permisos disponibles en dispositivos móviles no estan disponibles para su usuario.",
+          ),
+        )
+      );
   }
 }

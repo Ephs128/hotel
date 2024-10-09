@@ -1,68 +1,80 @@
 import 'package:flutter/material.dart';
+import 'package:hotel/data/models/login_model.dart';
+import 'package:hotel/data/models/menu_model.dart';
 import 'package:hotel/screens/mobile/login_view.dart';
+import 'package:hotel/screens/mobile/rooms/rooms_view.dart';
 
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class MenuWidget extends StatefulWidget {
-  const MenuWidget({super.key});
+  final Login login;
+  final String selectedMenuCode;
+
+  const MenuWidget({
+    super.key, 
+    required this.login, 
+    required this.selectedMenuCode,
+  });
 
   @override
   State<MenuWidget> createState() => _MenuWidgetState();
 }
 
 class _MenuWidgetState extends State<MenuWidget> {
+
   @override
   Widget build(BuildContext context) {
-    return Drawer(
-      child: Column(
-          children: [
-            const SizedBox(
-              height: 80,
-              child: DrawerHeader(
-                margin: EdgeInsets.only(bottom: 5),
-                child: Text("Company name", style: TextStyle(fontSize: 24),),
-              ),
-            ),
-            ListTile(
+    final List<Widget> tiles = [
+      const SizedBox(
+        height: 80,
+        child: DrawerHeader(
+          margin: EdgeInsets.only(bottom: 5),
+          child: Text("Company name", style: TextStyle(fontSize: 24),),
+        ),
+      ),
+    ];
+    bool selected = false;
+    for(Menu menu in widget.login.menus) {
+      switch(menu.menuCode) {
+        case Menu.mRoomCode:
+          selected = widget.selectedMenuCode == Menu.mRoomCode;
+          tiles.add(ListTile(
               leading: Icon(MdiIcons.homeVariant),
               title:  const Text("Habitaciones"),
-              onTap: () {
+              tileColor: selected ? Colors.grey : null,
+              onTap: selected ? null : () {
                 Navigator.pop(context); // ? Close drawer first
+                Navigator.pushAndRemoveUntil(
+                  context, 
+                  MaterialPageRoute(builder: (context) => RoomsView(login: widget.login, menu: menu)),
+                  (Route<dynamic> route) => false,
+                );
               },
-            ),
-            ListTile(
-              leading: Icon(MdiIcons.store),
-              title:  const Text("Productos"),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: Icon(MdiIcons.fileTableOutline),
-              title:  const Text("Reportes"),
-              onTap: () {
-                Navigator.pop(context); 
-              },
-            ),
-            const Spacer(),
-            const Divider(color: Colors.black45,),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 30),
-              child: ListTile(
-                leading: Icon(MdiIcons.logout),
-                title:  const Text("Cerrar Sesión"),
-                onTap: () {
-                  Navigator.pop(context); 
-                  Navigator.pushAndRemoveUntil(
-                    context, 
-                    MaterialPageRoute(builder: (context) => const LoginView()),
-                    (Route<dynamic> route) => false,
-                  );
-                },
-              ),
-            ),
-          ],
+          ));
+      }
+    }
+    tiles.add(const Spacer());
+    tiles.add(const Divider(color: Colors.black45,));
+    tiles.add(
+      Padding(
+        padding: const EdgeInsets.only(bottom: 30),
+        child: ListTile(
+          leading: Icon(MdiIcons.logout),
+          title:  const Text("Cerrar Sesión"),
+          onTap: () {
+            Navigator.pop(context); 
+            Navigator.pushAndRemoveUntil(
+              context, 
+              MaterialPageRoute(builder: (context) => const LoginView()),
+              (Route<dynamic> route) => false,
+            );
+          },
         ),
+      )
+    );
+
+    return Drawer(
+      child: Column(children: tiles),
     );
   }
 }

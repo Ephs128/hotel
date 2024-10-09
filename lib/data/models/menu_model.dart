@@ -1,7 +1,12 @@
 import 'dart:developer';
 
+import 'package:hotel/data/models/action_model.dart';
+
 class Menu {
-  final int id;
+
+  static const String mRoomCode = "MMPHB";
+
+  final String id;
   final String menuCode;
   final bool active;
   final String description;
@@ -9,7 +14,7 @@ class Menu {
   final int isMenu;
   final int? idSubmnenu;
   final List<Menu> submenus;
-  final Map<String,bool> actions;
+  final Map<String, Action> actions;
   bool? selected;
   Menu? parentMenu;
 
@@ -20,7 +25,7 @@ class Menu {
     required this.description,
     required this.state,
     required this.isMenu,
-    required this.idSubmnenu,
+    this.idSubmnenu,
     required this.submenus,
     required this.actions,
     this.selected = false,
@@ -28,18 +33,26 @@ class Menu {
   });
 
   factory Menu.fromJson(Map<String, dynamic> json) { 
-    List<dynamic> listMenus = json["submenus"];
-    List<dynamic> listActions = json["actions"];
+    List<dynamic> listMenus = json["submenus"] ?? [];
+    List<dynamic> listActions = json["acciones"] ?? [];
+    Map<String,Action> mapActions = Map.fromEntries(
+      listActions.map(
+        (actionJson) {
+          Action action = Action.fromJson(actionJson);
+          return MapEntry(action.actionCode, action);
+        }
+      )
+    );
     Menu instance = Menu(
       id: json["idMenu"],
-      menuCode: json["menuCode"],
-      active: json["active"] == 1,
-      description: json["description"],
-      state: json["state"] == 1,
-      isMenu: json["isMenu"],
+      menuCode: json["codigoMenu"],
+      active: json["activo"] == 1,
+      description: json["descripcion"],
+      state: json["estado"] == 1,
+      isMenu: json["esMenu"],
       idSubmnenu: json["idSubmnenu"],
       submenus: listMenus.map((jsonData) => Menu.fromJson(jsonData)).toList(),
-      actions: { for (var v in listActions) v.toString() : false },
+      actions: mapActions,
     );
     for(Menu submenu in instance.submenus) {
       submenu.parentMenu = instance;
@@ -53,16 +66,17 @@ class Menu {
     }
     bool areSame = true;
     bool? lastSelected;
-    for(bool value in actions.values) {
-      if (lastSelected == null) {
-        lastSelected = value;
-      } else {
-        areSame = lastSelected == value;
-        if (!areSame) {
-          selected = null;
-        }
-      }
-    }
+    // todo: update
+    // for(bool value in actions.values) {
+    //   if (lastSelected == null) {
+    //     lastSelected = value;
+    //   } else {
+    //     areSame = lastSelected == value;
+    //     if (!areSame) {
+    //       selected = null;
+    //     }
+    //   }
+    // }
     if (areSame){
       for(Menu submenu in submenus) {
         if (lastSelected == null) {
@@ -85,16 +99,18 @@ class Menu {
   }
 
   void setState(bool newState) {
+    // todo: update
     selected = newState;
-    for (String name in actions.keys) {
-      actions[name] = newState;
-    }
+    // for (String name in actions.keys) {
+    //   actions[name] = newState;
+    // }
     for (Menu submenu in submenus) {
       submenu.setState(newState);
     }
   }
 
   void updateAction(String action, bool value) {
-    actions[action] = value;
+    // todo: update
+    // actions[action] = value;
   }
 }

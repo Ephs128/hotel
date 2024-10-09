@@ -11,6 +11,10 @@ class Room {
   static const String dirty = "Sucio"; 
   static const String cleaning = "En limpieza"; 
   static const String maintenance = "En mantenimiento"; 
+  static const String outService = "Fuera de servicio";
+  static const String review = "En revisión";
+  static const String vip = "VIP"; 
+  static const String defaultState = "Estado no considerado"; 
 
   Room({
     required this.product,
@@ -29,6 +33,14 @@ class Room {
         state = cleaning;
       case 4:
         state = maintenance;
+      case 5:
+        state = outService;
+      case 6:
+        state = review;
+      case 7:
+        state = vip;
+      default:
+        state = defaultState;
     }
   }
 

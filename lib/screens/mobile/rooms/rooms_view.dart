@@ -2,11 +2,13 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:hotel/data/models/data.dart';
+import 'package:hotel/data/models/login_model.dart';
+import 'package:hotel/data/models/menu_model.dart';
 import 'package:hotel/data/models/room_model.dart';
 import 'package:hotel/data/service/room_service.dart';
 import 'package:hotel/data/stream_socket.dart';
 import 'package:hotel/screens/mobile/error_view.dart';
-import 'package:hotel/screens/mobile/rooms/room_cleaning.dart';
+import 'package:hotel/screens/mobile/rooms/room_before_cleaning_view.dart';
 import 'package:hotel/screens/mobile/loading_view.dart';
 import 'package:hotel/screens/mobile/widgets/menu_widget.dart';
 import 'package:hotel/screens/mobile/widgets/room_card_widget.dart';
@@ -14,7 +16,15 @@ import 'package:hotel/screens/mobile/widgets/room_card_widget.dart';
 import 'package:hotel/screens/mobile/widgets/dialogs.dart';
 
 class RoomsView extends StatefulWidget {
-  const RoomsView({super.key});
+  
+  final Login login;
+  final Menu menu;
+  
+  const RoomsView({
+    super.key, 
+    required this.login, 
+    required this.menu, 
+  });
 
   @override
   State<RoomsView> createState() => _RoomsViewState();
@@ -30,6 +40,7 @@ class _RoomsViewState extends State<RoomsView> {
   void updater(Room newRoom) {
     final idx = _getIndexFrom(newRoom);
     if(idx < _roomList.length) {
+      log("updated room");
       setState(() {
         _roomList[idx] = newRoom;
       });
@@ -80,74 +91,25 @@ class _RoomsViewState extends State<RoomsView> {
         _result!.data == null ?
         ErrorView(message: _result!.message)
         : body(),
-      drawer: const MenuWidget(),
+      drawer: MenuWidget(
+        login: widget.login,
+        selectedMenuCode: widget.menu.menuCode,
+      ),
     );
   }
 
   Widget body() {
     return SingleChildScrollView(
-        child: Column(
-          children: _roomList.map((room) {
-            void Function() onTap;
-            switch(room.state) {
-              case Room.free:
-                onTap = () => showConfirmationDialog(
-                  context: context, 
-                  title: "¿Habilitar habitación?",
-                  message: "Se habilitará la cerradura y se encenderan las luces",
-                  onConfirmation: () {
-                    actionRoom(context, room, roomService.enableRoom);
-                  }
-                );
-              case Room.inUse:
-                onTap = () => showMessageDialog(context: context, message: "No tienes permiso para ver esta habitación");
-              case Room.dirty:
-                onTap = () { 
-                  showConfirmationDialog(
-                    context: context, 
-                    title: "¿Limpiar habitación?",
-                    message: "Se habilitará la cerradura y se encenderan las luces",
-                    onConfirmation: () {
-                      actionRoom(context, room, roomService.cleanRoom);
-                      // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => RoomCleaning(room: room)));
-                    },);
-                };
-              case Room.cleaning:
-                onTap = () => Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => RoomCleaning(room: room)));
-              case Room.maintenance:
-                onTap = () => showMessageDialog(context: context, message: "No tienes permiso para ver esta habitación");
-              default:
-                onTap = () => showMessageDialog(context: context, message: "Surgio un error, estado de habitacion no válido");
-            }
-            return RoomCardWidget(
-              room: room, 
-              onTap: onTap,
-            );
-          }).toList(),
+        child: Center(
+          child: Column(
+            children: _roomList.map((room) {
+              return RoomCardWidget(
+                room: room, 
+                menu: widget.menu,
+              );
+            }).toList(),
+          ),
         ),
       );
-  }
-
-  Future<void> actionRoom(BuildContext context, Room room, Future<Data<String>> Function(Room) action ) async {
-    showLoaderDialog(context);
-    Data<String> result = await action(room);
-    if (context.mounted) closeLoaderDialog(context);
-    if (result.data == null) {
-      if (context.mounted) {
-        showMessageDialog(
-          context: context, 
-          title: "Error",
-          message: result.message
-        );
-      }
-    } else {
-      if (context.mounted) {
-        showMessageDialog(
-          context: context, 
-          title: "Bien",
-          message: result.data!
-        );
-      }
-    }
   }
 }

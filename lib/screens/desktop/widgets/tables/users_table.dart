@@ -45,9 +45,9 @@ class UsersTable extends StatelessWidget {
           TableRow(
             decoration: const BoxDecoration(color: constants.tableBackground),
             children: [
-              NormalTableCell(child: Text(user.person.getName())),
+              NormalTableCell(child: Text(user.person!.getName())),
               NormalTableCell(child: Text(user.user)),
-              NormalTableCell(child: Text(user.role.role)),
+              NormalTableCell(child: Text(user.role!.role)),
               StateTableCell(
                 status: user.state, 
                 activeLabel: "Activo", 
