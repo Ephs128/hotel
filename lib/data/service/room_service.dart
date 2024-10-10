@@ -18,9 +18,8 @@ class RoomService {
     return _api.dispRoom(room);
   }
 
-  Future<Data<String>> cleanRoom(Room room) async {
-    // room.product.time = DateTime.now();
-    room.product.activate = 6;
+  Future<Data<String>> cleanRoom(Room room, {int activate = 6}) async {
+    room.product.activate = activate;
     return _api.cleanRoom(room);
   }
 
@@ -34,5 +33,9 @@ class RoomService {
 
   Future<Data<String>> cleanFinish(Room room) async {
     return _api.cleanFinish(room);
+  }
+
+  Future<Data<String>> generateReport(RoomState room) async {
+    return _api.generateReport(room);
   }
 }

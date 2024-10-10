@@ -8,12 +8,9 @@ import 'package:hotel/data/models/room_model.dart';
 import 'package:hotel/data/service/room_service.dart';
 import 'package:hotel/data/stream_socket.dart';
 import 'package:hotel/screens/mobile/error_view.dart';
-import 'package:hotel/screens/mobile/rooms/room_before_cleaning_view.dart';
 import 'package:hotel/screens/mobile/loading_view.dart';
 import 'package:hotel/screens/mobile/widgets/menu_widget.dart';
 import 'package:hotel/screens/mobile/widgets/room_card_widget.dart';
-
-import 'package:hotel/screens/mobile/widgets/dialogs.dart';
 
 class RoomsView extends StatefulWidget {
   
@@ -42,7 +39,7 @@ class _RoomsViewState extends State<RoomsView> {
     if(idx < _roomList.length) {
       log("updated room");
       setState(() {
-        _roomList[idx] = newRoom;
+        _roomList[idx].update(newRoom);
       });
     }
   }

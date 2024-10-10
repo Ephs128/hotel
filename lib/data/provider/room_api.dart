@@ -214,4 +214,32 @@ Future<Data<String>> cleanFinish(Room room) async {
     }
   }
 
+  Future<Data<String>> generateReport(RoomState room) async {
+    _token ??= await storage.read(key: "token") ?? "wtf?";
+
+    var client = http.Client();
+    var uri = Uri.parse('$baseURL/api/v1/rooms/review');
+    var response = await client.post(
+      uri, 
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $_token',
+      },
+      body: jsonEncode(room.toJsonNoProducts()),
+    );
+    final jsonData = jsonDecode(response.body) as Map<String, dynamic>;
+    if (response.statusCode == 200) {
+      return Data(
+        data: jsonData["data"]["message"],
+      );
+    } else {
+      return Data(
+        message: jsonData["message"],
+        statusCode: jsonData["status"],
+        data: null
+      );
+    }
+  }
+
 }

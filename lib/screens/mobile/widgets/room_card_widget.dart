@@ -29,6 +29,7 @@ class RoomCardWidget extends StatefulWidget {
 
 class _RoomCardWidgetState extends State<RoomCardWidget> {
   final roomService = RoomService();
+  bool reviewPermission = false;
 
   @override
   void initState() {
@@ -38,23 +39,24 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
   @override
   Widget build(BuildContext context) {
     List<Widget> buttons = [];
-    Map<IconData, void Function(int)> actions = {};
     late Color bgHeader;
+    // reviewPermission = widget.menu.actions.containsKey("MMAARL");
+          reviewPermission = true;
     switch (widget.room.state) {
-      case Room.free: // free room
+      case Room.free:
         bgHeader = const Color.fromARGB(255, 52, 195, 143);
-        if(widget.menu.actions.containsKey("MMAAHB")){
-          buttons.add(
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 3),
-              child: IconButton(
-                icon: Icon(MdiIcons.play), 
-                color: Colors.white,
-                onPressed: () => {},
-              ),
-            )
-          );
-        }
+        // if(widget.menu.actions.containsKey("MMAAHB")){
+        //   buttons.add(
+        //     Padding(
+        //       padding: const EdgeInsets.symmetric(horizontal: 3),
+        //       child: IconButton(
+        //         icon: Icon(MdiIcons.play), 
+        //         color: Colors.white,
+        //         onPressed: () => {},
+        //       ),
+        //     )
+        //   );
+        // }
         // if(widget.menu.actions.containsKey("MMAARL")){
           buttons.add(
             Padding(
@@ -62,7 +64,7 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
               child: IconButton(
                 color: Colors.white,
                 icon: Icon(MdiIcons.clipboardTextSearchOutline), 
-                onPressed: () => {},
+                onPressed: () => _onClickReviewFreeRoom(),
               ),
             )
           );
@@ -70,16 +72,16 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
       case Room.inUse: // ocupied room
         bgHeader = const Color.fromARGB(255, 80, 165, 241);
         // if(widget.menu.actions.containsKey("MMAARL")){ //! descomentar
-          buttons.add(
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 3),
-              child: IconButton(
-                icon: Icon(MdiIcons.accountCash), 
-                color: Colors.white,
-                onPressed: () => {},
-              ),
-            )
-          );
+          // buttons.add(
+          //   Padding(
+          //     padding: const EdgeInsets.symmetric(horizontal: 3),
+          //     child: IconButton(
+          //       icon: Icon(MdiIcons.accountCash), 
+          //       color: Colors.white,
+          //       onPressed: () => {},
+          //     ),
+          //   )
+          // );
         // } //! descomentar
       case Room.dirty:
         bgHeader = const Color.fromARGB(255, 244, 106, 106);
@@ -90,21 +92,7 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
               child: IconButton(
                 icon: Icon(MdiIcons.broom), 
                 color: Colors.white,
-                onPressed: () => showConfirmationDialog(
-                  context: context, 
-                  title: "¿Limpiar habitación?",
-                  message: "Se habilitará la cerradura y se encenderan las luces",
-                  onConfirmation: () {
-                    _actionRoom(
-                      context:  context, 
-                      room: widget.room, 
-                      serviceAction: roomService.cleanRoom, 
-                      onOk: () =>  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => RoomBeforeCleaningView(room: widget.room))),
-                        
-                    );
-                  
-                  },
-                ),
+                onPressed: () => _onClickDirtyRoom()
               ),
             )
           );
@@ -147,25 +135,7 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
             child: IconButton(
               icon: Icon(MdiIcons.creation),
               color: Colors.white,
-              onPressed: () => showConfirmationDialog(
-                context: context, 
-                title: "¿Terminar limpieza?",
-                message: "Se cerrará la cerradura y se apagaran las luces",
-                onConfirmation: () {
-                  if(widget.room.product.time != null){
-                    Duration elapsedTime = DateTime.now().difference(widget.room.product.time!);
-                    widget.room.product.actualTime = format(elapsedTime);
-                    log("hora actual: ${widget.room.product.actualTime}");
-                    _actionRoom(
-                      context:  context, 
-                      room: widget.room, 
-                      serviceAction: roomService.cleanFinish, 
-                      onOk: () =>  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => RoomBeforeCleaningView(room: widget.room))),
-                        
-                    );
-                  }
-                }
-              ),
+              onPressed: () => _onClickEndCleaning(),
             ),
           )
         );
@@ -180,8 +150,8 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 3),
             child: IconButton(
-              icon: Icon(MdiIcons.broom),
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => RoomBeforeCleaningView(room: widget.room))),
+              icon: reviewPermission ? Icon(MdiIcons.eye) : Icon(MdiIcons.broom),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => RoomBeforeCleaningView(room: widget.room, reviewPermission: reviewPermission))),
               color: Colors.white,
             ),
           )
@@ -251,7 +221,7 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
 
   format(Duration d) => d.toString().split('.').first.padLeft(5, "0");
 
-  Future<void> _actionRoom({required BuildContext context, required Room room, required Future<Data<String>> Function(Room) serviceAction, required void Function() onOk} ) async {
+  Future<void> _actionRoom({required BuildContext context, required Room room, required Future<Data<String>> Function(Room) serviceAction, required void Function(String) onOk} ) async {
     showLoaderDialog(context);
     Data<String> result = await serviceAction(room);
     if (context.mounted) closeLoaderDialog(context);
@@ -264,15 +234,64 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
         );
       }
     } else {
-      // if (context.mounted) {
-      //   showMessageDialogWithAction(
-      //     context: context, 
-      //     title: "Bien",
-      //     message: result.data!,
-      //     onDismissable: onOk,
-      //   );
-      // }
-      onOk();
+      onOk(result.data!);
     }
   }
+
+  void _onClickDirtyRoom() {
+    showConfirmationDialog(
+      context: context, 
+      title: "¿Limpiar habitación?",
+      message: "Se habilitará la cerradura y se encenderan las luces.",
+      onConfirmation: () {
+        _actionRoom(
+          context:  context, 
+          room: widget.room, 
+          serviceAction: roomService.cleanRoom, 
+          onOk: (optionalMessage) =>  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => RoomBeforeCleaningView(room: widget.room, reviewPermission: reviewPermission))),
+            
+        );
+      
+      },
+    );
+  }
+
+  void _onClickEndCleaning() {
+    showConfirmationDialog(
+      context: context, 
+      title: "¿Terminar limpieza?",
+      message: "Se cerrará la cerradura y se apagaran las luces. Asegurese de estar fuera de la habitación antes de continuar.",
+      onConfirmation: () {
+        if(widget.room.product.time != null){
+          Duration elapsedTime = DateTime.now().difference(widget.room.product.time!);
+          widget.room.product.actualTime = format(elapsedTime);
+          log("hora actual: ${widget.room.product.actualTime}");
+          _actionRoom(
+            context:  context, 
+            room: widget.room, 
+            serviceAction: roomService.cleanFinish, 
+            onOk: (optionalMessage) => showMessageDialog(context: context, title: "Bien", message: optionalMessage,),
+          );
+        }
+      }
+    );
+  }
+
+  void _onClickReviewFreeRoom() {
+    showConfirmationDialog(
+      context: context, 
+      title: "¿Empezar revisión?",
+      message: "Se habilitará la cerradura y se encenderan las luces.", 
+      onConfirmation: () {
+        _actionRoom(
+          context:  context, 
+          room: widget.room, 
+          serviceAction: roomService.cleanRoom, 
+          onOk: (optionalMessage) =>  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => RoomBeforeCleaningView(room: widget.room, reviewPermission: reviewPermission,))),
+        );
+        // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => RoomBeforeCleaningView(room: widget.room, reviewPermission: reviewPermission)));
+      }
+    );
+  }
+
 }

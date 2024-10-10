@@ -1,7 +1,7 @@
 import 'package:hotel/data/models/product_model.dart';
 
 class Room {
-  final Product product;
+  Product product;
   late int id;
   late String name;
   late String state;
@@ -49,5 +49,14 @@ class Room {
   } 
 
   Map<String, dynamic> toJson() => product.toJson();
+
+  void update(Room room) {
+    if (id == room.id) {
+      name = room.name;
+      state = room.state;
+      isActive = room.isActive;
+      product.updateOnly(room.product);
+    }
+  }
 
 }

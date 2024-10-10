@@ -6,6 +6,7 @@ import 'package:hotel/data/models/store_product_model.dart';
 import 'package:hotel/data/service/product_service.dart';
 import 'package:hotel/screens/mobile/error_view.dart';
 import 'package:hotel/screens/mobile/loading_view.dart';
+import 'package:hotel/screens/mobile/widgets/dialogs.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class RoomCleaningProductView extends StatefulWidget {
@@ -28,6 +29,8 @@ class RoomCleaningProductView extends StatefulWidget {
 class _RoomCleaningProductViewState extends State<RoomCleaningProductView> {
   bool _isLoading = false;
   bool _searching = false;
+  bool _enableToLeave = false;
+  bool _acceptedPop = false;
   late List<StoreProduct> filteredList;
   final TextEditingController _searchController = TextEditingController();
   final Map<StoreProduct, int> productsCounter = {};
@@ -167,12 +170,8 @@ class _RoomCleaningProductViewState extends State<RoomCleaningProductView> {
         ),
       ),
       body: PopScope(
-        canPop: !_searching,
-        onPopInvoked: (didPop) {
-          if (_searching) {
-            _closeSearch();
-          }
-        },
+        canPop: false,
+        onPopInvoked: (didpop) => _backFunctionHandler(didpop),
         child: _isLoading ? 
           const Center(
             child: CircularProgressIndicator(),
@@ -229,7 +228,7 @@ class _RoomCleaningProductViewState extends State<RoomCleaningProductView> {
 
   void _addSelectedProducts() {
     setState(() {
-    widget.selectedProducts.clear();
+      widget.selectedProducts.clear();
       for(StoreProduct product in _productsList) {
         int cant = productsCounter[product]!;
         if (cant > 0) {
@@ -243,7 +242,83 @@ class _RoomCleaningProductViewState extends State<RoomCleaningProductView> {
         }
       } 
     });
+    _enableToLeave = true;
     Navigator.pop(context, widget.selectedProducts);
+  }
+
+  bool _thereAreChanges() {
+    bool areSame = true;
+    for(StoreProduct product in _productsList) {
+      int cant = productsCounter[product]!;
+      if (cant > 0) {
+        areSame = _haveSameCant(product, cant);
+      } else {
+        areSame = !_existsInSelected(product);
+      }
+      if (!areSame) {
+        break;
+      }
+    } 
+    return !areSame;
+  }
+
+  bool _haveSameCant(StoreProduct product, int cant) {
+    bool ans = false;
+    for (ProductCleanning productCleanning in widget.selectedProducts) {
+      if(productCleanning.productId == product.idProduct) {
+        ans = cant == productCleanning.cantity;
+        break;
+      }
+    }
+    return ans;
+  }
+
+  bool _existsInSelected(StoreProduct product) {
+    bool ans = false;
+    for (ProductCleanning productCleanning in widget.selectedProducts) {
+      if(productCleanning.productId == product.idProduct) {
+        ans = true;
+        break;
+      }
+    }
+    return ans;
+  }
+
+  void _backFunctionHandler (didPop) {
+    if(didPop) {
+      return;
+    }
+    if (_searching) {
+      _closeSearch();
+    } else if (_enableToLeave) {
+      if(!_acceptedPop){
+        Future.delayed(Duration.zero, () {
+          Navigator.pop(context);
+        });
+        _acceptedPop = true;
+      }
+    } else if (_thereAreChanges()) {
+      showConfirmationDialog(
+        context: context, 
+        title: "Salir sin guardar",
+        message: "Tiene cambios realizados ¿Desea salir de todas formas?", 
+        onConfirmation: () {
+          if (!_acceptedPop) {
+            Future.delayed(Duration.zero, () {
+              Navigator.pop(context);
+            });
+            _acceptedPop = true;
+          } 
+        }
+      );
+    } else {
+      if(!_acceptedPop){
+        Future.delayed(Duration.zero, () {
+          Navigator.pop(context);
+        });
+        _acceptedPop = true;
+      }
+    }
   }
 
   void _closeSearch() {
@@ -252,9 +327,11 @@ class _RoomCleaningProductViewState extends State<RoomCleaningProductView> {
       _searching = false;
     });
   }
+
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
   }
+  
 }

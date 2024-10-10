@@ -7,33 +7,33 @@ class Product {
   final int idProduct;
   final String productName;
   final String? description;
-  final String? position;
-  final String? productCode;
-  final String? serie;
-  final int type;
+  String? position;
+  String? productCode;
+  String? serie;
+  int type;
   int activate;
-  final int? productTYpe;
-  final int? idVenta;
-  final int? tolerance;
-  final int? toleranceCharge;
-  final int? toleranceOff;
+  int? productTYpe;
+  int? idVenta;
+  int? tolerance;
+  int? toleranceCharge;
+  int? toleranceOff;
   DateTime? time;
   String? actualTime;
-  final bool? automatic;
-  final bool? pulse;
-  final bool? selected;
-  final bool state;
-  final String? onUrl;
-  final String? offUrl;
-  final List<Compound> compounds;
-  final String? price;
-  final int? idFee;
-  final int? idCategory;
-  final Fee? fee;
-  final List<Promo> promos;
-  final DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
-  final int? idRoomState;
+  bool? automatic;
+  bool? pulse;
+  bool? selected;
+  bool state;
+  String? onUrl;
+  String? offUrl;
+  List<Compound> compounds;
+  String? price;
+  int? idFee;
+  int? idCategory;
+  Fee? fee;
+  List<Promo> promos;
+  int? idRoomState;
    
+  final DateFormat _dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
 
   Product({
     required this.idProduct,
@@ -122,7 +122,7 @@ class Product {
     if (idVenta != null) "idVenta": idVenta,
     if (tolerance != null) "tolerancia": tolerance,
     if (toleranceOff != null) "toleranciaOff": toleranceOff,
-    if (time != null) "hora": dateFormat.format(time!),
+    if (time != null) "hora": _dateFormat.format(time!),
     if (automatic != null) "automatico":  automatic! ? 1 : 0,
     if (pulse != null) "pulso":  pulse! ? 1 : 0,
     if (selected != null) "seleccionado":  selected! ? 1 : 0,
@@ -144,4 +144,31 @@ class Product {
   String toString() {
     return productName;
   }
+
+  void updateOnly(Product product) {
+    if (idProduct == product.idProduct) {
+      position = product.position;
+      productCode = product.productCode;
+      serie = product.serie;
+      type = product.type;
+      activate = product.activate;
+      productTYpe = product.productTYpe;
+      idVenta = product.idVenta;
+      tolerance = product.tolerance;
+      toleranceCharge = product.toleranceCharge;
+      toleranceOff = product.toleranceOff;
+      time = product.time;
+      actualTime = product.actualTime;
+      automatic = product.automatic;
+      pulse = product.pulse;
+      selected = product.selected;
+      state = product.state;
+      onUrl = product.onUrl;
+      offUrl = product.offUrl;
+      price = product.price;
+      idFee = product.idFee;
+      idCategory = product.idCategory;
+      idRoomState = product.idRoomState;
+    }
+  } 
 }

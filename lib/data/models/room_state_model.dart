@@ -10,7 +10,7 @@ class RoomState {
   final int idRoom;
   final int type;
   final DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
-  List<ProductCleanning> productsCleanning = [];
+  List<ProductCleanning>? productsCleanning;
 
   RoomState({
     this.id,
@@ -20,10 +20,10 @@ class RoomState {
     this.elapsedTime = "00:00:00",
     required this.idRoom,
     required this.type,
-    productsCleanning,
+    this.productsCleanning,
   }) {
     datetime ??= DateTime.now();
-    this.productsCleanning = productsCleanning ?? [];
+    productsCleanning ??= [];
   }
 
   Map<String,dynamic> toJson() => {
@@ -34,7 +34,17 @@ class RoomState {
     "detalle": detail ?? "",
     "idHabitacion": idRoom,
     "tipo": type,//1=limpieza rapida, 2=limpieza normal, 3=limpieza exhaustiva
-    "limpiezaProductos": productsCleanning.map((productC) => productC.toJson()).toList()
+    "limpiezaProductos": productsCleanning!.map((productC) => productC.toJson()).toList()
+  };
+
+  Map<String,dynamic> toJsonNoProducts() => {
+    if(id != null) "idEstadoHabitacion": id!,
+    "activado": activate,
+    "tiempo": elapsedTime, 
+    if(datetime != null) "hora": dateFormat.format(datetime!),
+    "detalle": detail ?? "",
+    "idHabitacion": idRoom,
+    "tipo": type,//1=limpieza rapida, 2=limpieza normal, 3=limpieza exhaustiva
   };
 
 }
