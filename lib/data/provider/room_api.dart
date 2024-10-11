@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hotel/data/models/data.dart';
+import 'package:hotel/data/models/product_model.dart';
 import 'package:hotel/data/models/room_model.dart';
 import 'package:hotel/data/models/room_state_model.dart';
 
@@ -69,7 +70,9 @@ class RoomApi {
     }
   }
 
-  Future<Data<String>> cleanRoom(Room room) async {
+  Future<Data<String>> cleanRoom(Room room, int activate) async {
+    int oldval = room.product.activate;
+    room.product.activate = activate;
     _token ??= await storage.read(key: "token") ?? "wtf?";
 
     var client = http.Client();
@@ -91,6 +94,7 @@ class RoomApi {
         data: jsonData["data"]["message"],
       );
     } else {
+      room.product.activate = oldval;
       return Data(
         message: jsonData["message"],
         statusCode: jsonData["status"],
@@ -99,8 +103,11 @@ class RoomApi {
     }
   }
 
-  Future<Data<String>> dispRoom(Room room) async {
+  Future<Data<String>> dispRoom(Product product, int activate) async {
     _token ??= await storage.read(key: "token") ?? "wtf?";
+    
+    int oldval = product.activate;
+    product.activate = activate;
 
     var client = http.Client();
     var uri = Uri.parse('$baseURL/api/v1/rooms/disp');
@@ -111,7 +118,7 @@ class RoomApi {
         'Accept': 'application/json',
         'Authorization': 'Bearer $_token',
       },
-      body: jsonEncode(room.toJson()),
+      body: jsonEncode(product.toJson()),
     );
     final jsonData = jsonDecode(response.body) as Map<String, dynamic>;
     if (response.statusCode == 200) {
@@ -119,6 +126,7 @@ class RoomApi {
         data: jsonData["data"]["message"],
       );
     } else {
+      product.activate = oldval;
       return Data(
         message: jsonData["message"],
         statusCode: jsonData["status"],

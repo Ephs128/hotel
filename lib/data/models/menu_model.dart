@@ -59,6 +59,18 @@ class Menu {
     }
     return instance;
   }
+
+  Map<String, dynamic> toJson() => {
+    "idMenu": id,
+    "codigoMenu": menuCode,
+    "activo": active ? 1 : 0,
+    "descripcion": description,
+    "estado": state ? 1 : 0,
+    "esMenu": isMenu,
+    "idSubmnenu": idSubmnenu,
+    "submenus": submenus.map((submenu) => submenu.toJson()).toList(),
+    "actions": actions.values.map((action) => action.toJson()).toList(),
+  };
   
   void calculateSelectedValue() {
     for(Menu submenu in submenus) {

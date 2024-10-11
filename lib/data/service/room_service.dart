@@ -1,4 +1,5 @@
 import 'package:hotel/data/models/data.dart';
+import 'package:hotel/data/models/product_model.dart';
 import 'package:hotel/data/models/room_model.dart';
 import 'package:hotel/data/models/room_state_model.dart';
 import 'package:hotel/data/provider/room_api.dart';
@@ -14,13 +15,12 @@ class RoomService {
     return _api.enableRoom(room);
   }
 
-  Future<Data<String>> dispRoom(Room room) async {
-    return _api.dispRoom(room);
+  Future<Data<String>> dispRoom(Product product, int activate) async {
+    return _api.dispRoom(product, activate);
   }
 
   Future<Data<String>> cleanRoom(Room room, {int activate = 6}) async {
-    room.product.activate = activate;
-    return _api.cleanRoom(room);
+    return _api.cleanRoom(room, activate);
   }
 
   Future<Data<String>> cleanStart(RoomState room) async {

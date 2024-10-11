@@ -5,7 +5,7 @@ class Compound {
   final bool state;
   final int idProduct;
   final int idSubproduct;
-  final Product subproduct;
+  Product subproduct;
 
   Compound({
     required this.id,

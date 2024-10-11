@@ -13,6 +13,7 @@ class User {
   Person? person;
   Role? role;
   int idRole;
+  int? idSession;
   List<UserStore> stores;
   List<UserCashbox> cashboxes;
 
@@ -28,6 +29,7 @@ class User {
     required this.idRole,
     required this.stores,
     required this.cashboxes,
+    this.idSession,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -51,6 +53,7 @@ class User {
       person: person,
       role: role,
       idRole: json["idRol"],
+      idSession: json["idSesion"],
       stores: listStores.map((jsonData) => UserStore.fromJson(jsonData)).toList(),
       cashboxes: listCashboxes.map((jsonData) => UserCashbox.fromJson(jsonData)).toList(),
     );
@@ -65,8 +68,10 @@ class User {
     "estado": state ? 1 : 0,
     if (person != null) "persona": person!.toJson(),
     if (role != null) "rol": role!.toJson(),
-    "userStores": stores.map((store) => store.toJson()).toList(),
-    "userCashboxes": cashboxes.map((cashbox) => cashbox.toJson()).toList(),
+    "idRol": idRole,
+    if(idSession != null) "idSesion": idSession,
+    "usuarioAlmacenes": stores.map((store) => store.toJson()).toList(),
+    "usuarioCajas": cashboxes.map((cashbox) => cashbox.toJson()).toList(),
   };
     
 }

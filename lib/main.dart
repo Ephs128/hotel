@@ -2,7 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hotel/screens/desktop/login_screen.dart';
-import 'package:hotel/screens/mobile/login_view.dart';
+import 'package:hotel/screens/mobile/login_manager.dart';
 
 
 void main() => runApp(const MyApp());
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
         ],
         supportedLocales: [Locale("es")],
         debugShowCheckedModeBanner: false,
-        home: LoginView(),
+        home: LoginManager(),
       );
     } else {
       return const FluentApp(

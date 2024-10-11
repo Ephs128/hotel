@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hotel/data/models/compound_model.dart';
 import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/models/menu_model.dart';
+import 'package:hotel/data/models/product_model.dart';
 import 'package:hotel/data/service/room_service.dart';
 import 'package:hotel/screens/mobile/rooms/room_before_cleaning_view.dart';
 import 'package:hotel/screens/mobile/widgets/elapsed_time_widget.dart';
@@ -103,29 +104,17 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
         for(Compound compound in widget.room.product.compounds) {
           if (compound.subproduct.type == 3) { // type 3 = device
             if (compound.subproduct.productTYpe == 3) {// type 3 = fan
-              if (compound.subproduct.activate == 0) {
-                buttons.add(
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 3),
-                    child: IconButton(
-                      icon: Icon(MdiIcons.fanOff), 
-                      onPressed: () => {},
-                      color: Colors.white,
-                    ),
-                  )
-                );
-              } else {
-                buttons.add(
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 3),
-                    child: IconButton(
-                      icon: Icon(MdiIcons.fan), 
-                      color: Colors.red,
-                      onPressed: () => {},
-                    ),
-                  )
-                );
-              }
+              bool off = compound.subproduct.activate == 0;
+              buttons.add(
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  child: IconButton(
+                    icon: Icon(off ? MdiIcons.fanOff: MdiIcons.fan), 
+                    onPressed: () => _onClickFan(context, compound.subproduct, off),
+                    color: off? Colors.white : Colors.red,
+                  ),
+                )
+              );
             }
           }
         }
@@ -146,6 +135,23 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
         bgHeader = const Color.fromARGB(255, 52, 58, 64);
       case Room.review:
         bgHeader = const Color.fromARGB(255, 86, 74, 177);
+        for(Compound compound in widget.room.product.compounds) {
+          if (compound.subproduct.type == 3) { // type 3 = device
+            if (compound.subproduct.productTYpe == 3) {// type 3 = fan
+              bool off = compound.subproduct.activate == 0;
+              buttons.add(
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  child: IconButton(
+                    icon: Icon(off ? MdiIcons.fanOff: MdiIcons.fan), 
+                    onPressed: () => _onClickFan(context, compound.subproduct, off),
+                    color: off? Colors.white : Colors.red,
+                  ),
+                )
+              );
+            }
+          }
+        }
         buttons.add(
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 3),
@@ -292,6 +298,24 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
         // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => RoomBeforeCleaningView(room: widget.room, reviewPermission: reviewPermission)));
       }
     );
+  }
+
+  void _onClickFan(BuildContext context, Product device, bool isOff) async {
+    showLoaderDialog(context);
+    Data<String> result = await roomService.dispRoom(device, isOff ? 1 : 0);
+    if (context.mounted) {
+      closeLoaderDialog(context);
+      if(result.data == null) {
+        showMessageDialog(
+          context: context, 
+          title: "Hubo un error",
+          message: result.message,
+        );
+      } else {
+        // todo: se deberia hacer algo? o_O 
+      }
+    }
+
   }
 
 }

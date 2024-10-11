@@ -53,7 +53,7 @@ class _RoomsScreenState extends State<RoomsScreen> {
   @override
   void initState() {
     super.initState();
-    _streamSocket = StreamSocket(updater);
+    _streamSocket = StreamSocket(updater, (device) {});
     _streamSocket.connectAndListen();
     _fetchRooms();
   }

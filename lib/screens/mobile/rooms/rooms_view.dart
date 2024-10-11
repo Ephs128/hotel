@@ -1,9 +1,11 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:hotel/data/models/compound_model.dart';
 import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/models/login_model.dart';
 import 'package:hotel/data/models/menu_model.dart';
+import 'package:hotel/data/models/product_model.dart';
 import 'package:hotel/data/models/room_model.dart';
 import 'package:hotel/data/service/room_service.dart';
 import 'package:hotel/data/stream_socket.dart';
@@ -44,6 +46,24 @@ class _RoomsViewState extends State<RoomsView> {
     }
   }
 
+  void updateDevice(Product device) {
+    bool found = false;
+    for(Room room in _roomList) {
+      for (Compound compound in room.product.compounds) {
+        found = compound.subproduct.idProduct == device.idProduct;
+        if(found) {
+          setState(() {
+            compound.subproduct = device;
+          });
+          break;
+        }
+      }
+      if (found) {
+        break;
+      }
+    }
+  }
+
   int _getIndexFrom(Room newRoom) {
     int i = 0;
     for(Room room in _roomList) {
@@ -58,7 +78,7 @@ class _RoomsViewState extends State<RoomsView> {
   @override
   void initState() {
     super.initState();
-    _streamSocket = StreamSocket(updater);
+    _streamSocket = StreamSocket(updater,updateDevice);
     _streamSocket.connectAndListen();
     _fetchRooms();
   }
@@ -85,7 +105,7 @@ class _RoomsViewState extends State<RoomsView> {
       ),
       body: !_isLoaded ? 
         const LoadingView() : 
-        _result!.data == null ?
+        _result!.data == null ? 
         ErrorView(message: _result!.message)
         : body(),
       drawer: MenuWidget(
@@ -109,4 +129,10 @@ class _RoomsViewState extends State<RoomsView> {
         ),
       );
   }
+
+  // Widget _whenErrorHappens() {
+  //   if (_result!.statusCode == 401) {
+  //     return Loggin
+  //   }
+  // }
 }

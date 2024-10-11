@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hotel/data/models/compound_model.dart';
 import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/models/product_cleanning_model.dart';
+import 'package:hotel/data/models/product_model.dart';
 import 'package:hotel/data/models/room_model.dart';
 import 'package:hotel/data/models/room_state_model.dart';
 import 'package:hotel/data/service/room_service.dart';
@@ -42,6 +43,29 @@ class _RoomBeforeCleaningViewState extends State<RoomBeforeCleaningView> {
   
   @override
   Widget build(BuildContext context) {
+    List<Widget> devices = [];
+    for (Compound compound in widget.room.product.compounds) {
+      if (compound.subproduct.type == 3) {
+        if (compound.subproduct.productTYpe == 3) {
+          bool off = compound.subproduct.activate == 0;
+          devices.add(
+            Row(
+              children: [
+                Icon(MdiIcons.fan),
+                const SizedBox(width: 10,),
+                Text(compound.subproduct.productName),
+                const Spacer(),
+                Switch(
+                  value: !off, 
+                  onChanged: (value) => _onClickFan(context, compound.subproduct, off),
+                )
+              ]
+            )
+          );
+          devices.add(const SizedBox(height: 20,));
+        }
+      }
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.room.name),
@@ -59,27 +83,7 @@ class _RoomBeforeCleaningViewState extends State<RoomBeforeCleaningView> {
                   
                   // Dispositivos
 
-                  for (Compound compound in widget.room.product.compounds) 
-                    if (compound.subproduct.type == 3)
-                      if (compound.subproduct.productTYpe == 3) 
-                        Row(
-                          children: [
-                            Icon(MdiIcons.fan),
-                            const SizedBox(width: 10,),
-                            Text(compound.subproduct.productName),
-                            const Spacer(),
-                            Switch(
-                              value: compound.subproduct.activate == 1, 
-                              onChanged: (value) {
-                                // todo: await api call
-                                setState(() {
-                                  compound.subproduct.activate = value? 1 : 0;
-                                });
-                              }
-                            )
-                    ],
-                  ),
-                  const SizedBox(height: 20,), 
+                  for (Widget device in devices) device,
  
 
                   const Text("Tipo de limpieza", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),),
@@ -355,4 +359,22 @@ class _RoomBeforeCleaningViewState extends State<RoomBeforeCleaningView> {
     }
   }
 
+  void _onClickFan(BuildContext context, Product device, bool isOff) async {
+    showLoaderDialog(context);
+    Data<String> result = await _roomService.dispRoom(device, isOff ? 1 : 0);
+    if (context.mounted) {
+      closeLoaderDialog(context);
+      if(result.data == null) {
+        showMessageDialog(
+          context: context, 
+          title: "Hubo un error",
+          message: result.message,
+        );
+      } else {
+        setState(() {
+          isOff = true;
+        });
+      }
+    }
+  }
 }

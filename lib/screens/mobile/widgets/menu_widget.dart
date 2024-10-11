@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/models/login_model.dart';
 import 'package:hotel/data/models/menu_model.dart';
+import 'package:hotel/data/service/login_service.dart';
 import 'package:hotel/screens/mobile/login_view.dart';
 import 'package:hotel/screens/mobile/rooms/rooms_view.dart';
+import 'package:hotel/screens/mobile/widgets/dialogs.dart';
 
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
@@ -63,18 +66,36 @@ class _MenuWidgetState extends State<MenuWidget> {
           title:  const Text("Cerrar Sesión"),
           onTap: () {
             Navigator.pop(context); 
-            Navigator.pushAndRemoveUntil(
-              context, 
-              MaterialPageRoute(builder: (context) => const LoginView()),
-              (Route<dynamic> route) => false,
-            );
+            _logout(context);
           },
         ),
       )
     );
-
     return Drawer(
       child: Column(children: tiles),
     );
+  }
+
+  void _logout(BuildContext context) async {
+    showLoaderDialog(context);
+    LoginService loginService = LoginService();
+    Data<String> result = await loginService.postLogout(widget.login.user);
+    if (context.mounted) {
+      closeLoaderDialog(context);
+      
+      if (result.data != null) {
+        Navigator.pushAndRemoveUntil(
+          context, 
+          MaterialPageRoute(builder: (context) => const LoginView()),
+          (Route<dynamic> route) => false,
+        );
+      } else {
+        showMessageDialog(
+          context: context, 
+          title: "Hubo un error",
+          message: result.message
+        );
+      }
+    }
   }
 }

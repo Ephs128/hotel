@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/models/login_model.dart';
 import 'package:hotel/data/models/menu_model.dart';
@@ -7,11 +10,19 @@ import 'package:hotel/screens/mobile/error_view.dart';
 import 'package:hotel/screens/mobile/rooms/rooms_view.dart';
 
 import 'package:hotel/screens/mobile/widgets/dialogs.dart';
+import 'package:hotel/screens/mobile/without_options.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:hotel/data/env.dart';//! borrar
 
 class LoginView extends StatefulWidget {
-  const LoginView({super.key});
+  final String? message;
+  final String? titleMessage;
+  
+  const LoginView({
+    super.key,
+    this.message,
+    this.titleMessage,
+  });
 
   @override
   State<LoginView> createState() => _LoginViewState();
@@ -23,6 +34,7 @@ class _LoginViewState extends State<LoginView> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _ipController = TextEditingController(); //! borrar
   final TextEditingController _passwordController = TextEditingController();
+  final storage = const FlutterSecureStorage();
 
   Future<void> sendPostRequest(BuildContext context) async {
     showLoaderDialog(context);
@@ -47,6 +59,20 @@ class _LoginViewState extends State<LoginView> {
         toHome(context, result.data!);
       }
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (widget.message != null) {
+        if (widget.titleMessage == null) {
+          showMessageDialog(context: context, message: widget.message!);
+        } else {
+          showMessageDialog(context: context, title: widget.titleMessage!, message: widget.message!);
+        }
+      }
+    });
   }
 
   @override
@@ -112,30 +138,33 @@ class _LoginViewState extends State<LoginView> {
     return null;
   }
 
-  void toHome(BuildContext context, Login login) {
+  void toHome(BuildContext context, Login login) async {
     Widget? view;
     for(Menu menu in login.menus) {
       switch(menu.menuCode) {
         case Menu.mRoomCode:
-          view ??= RoomsView(
+        if (view == null) {
+          view = RoomsView(
             login: login,
             menu: menu,
           );
+          await storage.write(
+            key: "menu", 
+            value: jsonEncode(menu.toJson()),
+          );
+        }
       }
       if(view != null) {
         break;
       }
     }
-    Navigator.pushReplacement(
-      context, 
-      MaterialPageRoute(
-        builder: (context) => 
-          view ?? 
-          const ErrorView(
-            message: "No tiene permisos", 
-            description: "Los permisos disponibles en dispositivos móviles no estan disponibles para su usuario.",
-          ),
+    if (context.mounted){
+      Navigator.pushReplacement(
+        context, 
+        MaterialPageRoute(
+          builder: (context) => view ?? WithoutOptions(login: login)
         )
       );
+    }
   }
 }

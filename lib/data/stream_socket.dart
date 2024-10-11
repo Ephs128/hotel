@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'package:hotel/data/homeassistant.dart';
+import 'package:hotel/data/models/product_model.dart';
 import 'package:hotel/data/models/room_model.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:hotel/data/env.dart';
@@ -10,9 +11,10 @@ class StreamSocket{
   final _socketResponse= StreamController<String>();
   final _homeassistant =  Homeassistant();
   final void Function(Room) updater; 
+  final void Function(Product) updateDevice; 
   late IO.Socket _socket;
 
-  StreamSocket(this.updater) ;
+  StreamSocket(this.updater, this.updateDevice) ;
 
   void Function(String) get addResponse => _socketResponse.sink.add;
 
@@ -45,8 +47,12 @@ class StreamSocket{
       log("Data: ${data.toString()}");
       // Map<String, dynamic> result = Map.castFrom(json.decode(data));
       // final result = jsonDecode(data) as Map<String,dynamic>;
-      Room newRoom = Room.fromJson(data["habitacion"]);
-      updater(newRoom);
+      Product product = Product.fromJson(data["habitacion"]);
+      if (product.type == 2) {
+        Room newRoom = Room(product: product);
+        updater(newRoom);
+      } else if (product.type == 3){
+        updateDevice(product);      }
     });
   }
   

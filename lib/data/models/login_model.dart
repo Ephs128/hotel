@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:hotel/data/models/menu_model.dart';
 import 'package:hotel/data/models/user_model.dart';
 
@@ -18,6 +20,8 @@ class Login {
 
   factory Login.fromJson(Map<String, dynamic> json) {
     List<dynamic> listMenu = json["menus"];
+    log("data usuario:");
+    log(json["usuario"].toString());
     return Login(
       user: User.fromJson(json["usuario"]),
       menus: listMenu.map((menuJson) => Menu.fromJson(menuJson)).toList(),
@@ -26,4 +30,14 @@ class Login {
       homeassistantToken: json["config"]["token"],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    "usuario": user.toJson(),
+    "menus": menus.map((menu) => menu.toJson(),).toList(),
+    "token": token,
+    "config": {
+      "url": homeassistantURL,
+      "token": homeassistantToken,
+    }
+  };
 }
