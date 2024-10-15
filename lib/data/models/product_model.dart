@@ -1,5 +1,6 @@
 import 'package:hotel/data/models/compound_model.dart';
 import 'package:hotel/data/models/fee_model.dart';
+import 'package:hotel/data/models/product_promo_model.dart';
 import 'package:hotel/data/models/promo_model.dart';
 import 'package:intl/intl.dart';
 
@@ -30,7 +31,7 @@ class Product {
   int? idFee;
   int? idCategory;
   Fee? fee;
-  List<Promo> promos;
+  List<ProductPromo> promos;
   int? idRoomState;
    
   final DateFormat _dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
@@ -102,7 +103,7 @@ class Product {
       idFee: json["idPrecio"],
       idCategory: json["idCategoria"],
       fee: price,
-      promos: promoList.map((jsonData) => Promo.fromJson(jsonData)).toList(),
+      promos: promoList.map((jsonData) => ProductPromo.fromJson(jsonData)).toList(),
       toleranceCharge: json["toleranciaCobro"],
       actualTime: json["horaActual"],
       idRoomState: json["idEstadoHabitacion"],

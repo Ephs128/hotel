@@ -41,8 +41,7 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
   Widget build(BuildContext context) {
     List<Widget> buttons = [];
     late Color bgHeader;
-    // reviewPermission = widget.menu.actions.containsKey("MMAARL");
-          reviewPermission = true;
+    reviewPermission = widget.menu.actions.containsKey("MMAARL");
     switch (widget.room.state) {
       case Room.free:
         bgHeader = const Color.fromARGB(255, 52, 195, 143);
@@ -58,7 +57,7 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
         //     )
         //   );
         // }
-        // if(widget.menu.actions.containsKey("MMAARL")){
+        if(reviewPermission){
           buttons.add(
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 3),
@@ -69,7 +68,7 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
               ),
             )
           );
-        // }
+        }
       case Room.inUse: // ocupied room
         bgHeader = const Color.fromARGB(255, 80, 165, 241);
         // if(widget.menu.actions.containsKey("MMAARL")){ //! descomentar
@@ -86,7 +85,7 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
         // } //! descomentar
       case Room.dirty:
         bgHeader = const Color.fromARGB(255, 244, 106, 106);
-        // if(widget.menu.actions.containsKey("MMAALP")){ //! descomentar 
+        if(widget.menu.actions.containsKey("MMAALP")){ 
         buttons.add(
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 3),
@@ -97,71 +96,73 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
               ),
             )
           );
-        // } //! descomentar 
+        } 
       case Room.cleaning:
         bgHeader = const Color.fromARGB(255, 241, 180, 76);
-        // if(widget.menu.actions.containsKey("MMAALP")){ //! descomentar 
-        for(Compound compound in widget.room.product.compounds) {
-          if (compound.subproduct.type == 3) { // type 3 = device
-            if (compound.subproduct.productTYpe == 3) {// type 3 = fan
-              bool off = compound.subproduct.activate == 0;
-              buttons.add(
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
-                  child: IconButton(
-                    icon: Icon(off ? MdiIcons.fanOff: MdiIcons.fan), 
-                    onPressed: () => _onClickFan(context, compound.subproduct, off),
-                    color: off? Colors.white : Colors.red,
-                  ),
-                )
-              );
+        if(widget.menu.actions.containsKey("MMAALP")){ 
+          for(Compound compound in widget.room.product.compounds) {
+            if (compound.subproduct.type == 3) { // type 3 = device
+              if (compound.subproduct.productTYpe == 3) {// type 3 = fan
+                bool off = compound.subproduct.activate == 0;
+                buttons.add(
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 3),
+                    child: IconButton(
+                      icon: Icon(off ? MdiIcons.fanOff: MdiIcons.fan), 
+                      onPressed: () => _onClickFan(context, compound.subproduct, off),
+                      color: off? Colors.white : Colors.red,
+                    ),
+                  )
+                );
+              }
             }
           }
+          buttons.add(
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 3),
+              child: IconButton(
+                icon: Icon(MdiIcons.creation),
+                color: Colors.white,
+                onPressed: () => _onClickEndCleaning(),
+              ),
+            )
+          );
         }
-        buttons.add(
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 3),
-            child: IconButton(
-              icon: Icon(MdiIcons.creation),
-              color: Colors.white,
-              onPressed: () => _onClickEndCleaning(),
-            ),
-          )
-        );
-        // } //! descomentar 
       case Room.maintenance:
         bgHeader = const Color.fromARGB(255, 116, 120, 141);
       case Room.outService:
         bgHeader = const Color.fromARGB(255, 52, 58, 64);
       case Room.review:
         bgHeader = const Color.fromARGB(255, 86, 74, 177);
-        for(Compound compound in widget.room.product.compounds) {
-          if (compound.subproduct.type == 3) { // type 3 = device
-            if (compound.subproduct.productTYpe == 3) {// type 3 = fan
-              bool off = compound.subproduct.activate == 0;
-              buttons.add(
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
-                  child: IconButton(
-                    icon: Icon(off ? MdiIcons.fanOff: MdiIcons.fan), 
-                    onPressed: () => _onClickFan(context, compound.subproduct, off),
-                    color: off? Colors.white : Colors.red,
-                  ),
-                )
-              );
+        if(widget.menu.actions.containsKey("MMAALP") || reviewPermission ) {
+          for(Compound compound in widget.room.product.compounds) {
+            if (compound.subproduct.type == 3) { // type 3 = device
+              if (compound.subproduct.productTYpe == 3) {// type 3 = fan
+                bool off = compound.subproduct.activate == 0;
+                buttons.add(
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 3),
+                    child: IconButton(
+                      icon: Icon(off ? MdiIcons.fanOff: MdiIcons.fan), 
+                      onPressed: () => _onClickFan(context, compound.subproduct, off),
+                      color: off? Colors.white : Colors.red,
+                    ),
+                  )
+                );
+              }
             }
           }
+          buttons.add(
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 3),
+              child: IconButton(
+                icon: reviewPermission ? Icon(MdiIcons.eye) : Icon(MdiIcons.broom),
+                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => RoomBeforeCleaningView(room: widget.room, reviewPermission: reviewPermission))),
+                color: Colors.white,
+              ),
+            )
+          );
         }
-        buttons.add(
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 3),
-            child: IconButton(
-              icon: reviewPermission ? Icon(MdiIcons.eye) : Icon(MdiIcons.broom),
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => RoomBeforeCleaningView(room: widget.room, reviewPermission: reviewPermission))),
-              color: Colors.white,
-            ),
-          )
-        );
       case Room.vip:
         bgHeader = const Color.fromARGB(255, 232, 62, 140);
       default:

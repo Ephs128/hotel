@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/models/login_model.dart';
@@ -65,7 +67,6 @@ class _MenuWidgetState extends State<MenuWidget> {
           leading: Icon(MdiIcons.logout),
           title:  const Text("Cerrar Sesión"),
           onTap: () {
-            Navigator.pop(context); 
             _logout(context);
           },
         ),
@@ -78,18 +79,23 @@ class _MenuWidgetState extends State<MenuWidget> {
 
   void _logout(BuildContext context) async {
     showLoaderDialog(context);
+    log("loggin out");
     LoginService loginService = LoginService();
     Data<String> result = await loginService.postLogout(widget.login.user);
     if (context.mounted) {
       closeLoaderDialog(context);
       
       if (result.data != null) {
+        log("ready to getBack");
+        Navigator.pop(context); 
         Navigator.pushAndRemoveUntil(
           context, 
           MaterialPageRoute(builder: (context) => const LoginView()),
           (Route<dynamic> route) => false,
         );
       } else {
+        log("there was an error");
+        Navigator.pop(context); 
         showMessageDialog(
           context: context, 
           title: "Hubo un error",

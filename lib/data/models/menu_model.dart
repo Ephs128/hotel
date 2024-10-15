@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:hotel/data/models/action_model.dart';
@@ -69,7 +70,7 @@ class Menu {
     "esMenu": isMenu,
     "idSubmnenu": idSubmnenu,
     "submenus": submenus.map((submenu) => submenu.toJson()).toList(),
-    "actions": actions.values.map((action) => action.toJson()).toList(),
+    "acciones": actions.values.map((action) => action.toJson()).toList(),
   };
   
   void calculateSelectedValue() {

@@ -2,7 +2,7 @@ class Promo {
 
   final int id;
   final String details;
-  final double price;
+  final String price;
   final int time;
   final bool state;
 
@@ -19,7 +19,7 @@ class Promo {
     details: json["detalle"], 
     price: json["precio"], 
     time: json["tiempo"], 
-    state: json["estado"], 
+    state: json["estado"] == 1, 
   );
 
   Map<String, dynamic> toJson() => {
@@ -27,7 +27,7 @@ class Promo {
     "detalle": details, 
     "precio": price, 
     "tiempo": time, 
-    "estado": state, 
+    "estado": state ? 1 : 0, 
   };
 
 }

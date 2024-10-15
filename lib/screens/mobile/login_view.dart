@@ -6,7 +6,6 @@ import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/models/login_model.dart';
 import 'package:hotel/data/models/menu_model.dart';
 import 'package:hotel/data/service/login_service.dart';
-import 'package:hotel/screens/mobile/error_view.dart';
 import 'package:hotel/screens/mobile/rooms/rooms_view.dart';
 
 import 'package:hotel/screens/mobile/widgets/dialogs.dart';
@@ -35,6 +34,7 @@ class _LoginViewState extends State<LoginView> {
   final TextEditingController _ipController = TextEditingController(); //! borrar
   final TextEditingController _passwordController = TextEditingController();
   final storage = const FlutterSecureStorage();
+  bool showPassword = false;
 
   Future<void> sendPostRequest(BuildContext context) async {
     showLoaderDialog(context);
@@ -103,15 +103,30 @@ class _LoginViewState extends State<LoginView> {
                 const SizedBox(height: 10,),
                 const Text("Nombre usuario"),
                 TextFormField(
-                  validator: emptyValidator,
+                  validator: (value) => _validator(value, 5, 19),
                   controller: _nameController,
                 ),
                 const SizedBox(height: 10,),
                 const Text("Contraseña"),
-                TextFormField(
-                  validator: emptyValidator,
-                  controller: _passwordController,
-                ),
+                // Row(
+                  // children: [
+                    TextFormField(
+                      obscureText: !showPassword,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      validator: (value) => _validator(value, 3, 9),
+                      controller: _passwordController,
+                    ),
+                //     IconButton(
+                //       onPressed: () {
+                //         setState(() {
+                //           showPassword = !showPassword;
+                //         });
+                //       }, 
+                //       icon: Icon(showPassword ? MdiIcons.eye : MdiIcons.eyeOff)
+                //     ),
+                //   ]
+                // ),
                 const SizedBox(height: 30,),
                 Center(
                   child: ElevatedButton(
@@ -131,9 +146,16 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  String? emptyValidator(String? value) {
+  String? _validator(String? value, int min, int max) {
     if (value == null || value.isEmpty) {
       return "Campo obligatorio";
+    } else {
+      int length = value.length;
+      if (length > max) {
+        return "Ha ingresado demasiados caracteres, máximo $max";
+      } else if (length < min) {
+        return "Ha ingresado muy pocos caracteres, mínimo $min";
+      }
     }
     return null;
   }
