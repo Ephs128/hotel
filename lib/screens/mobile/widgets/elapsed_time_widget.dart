@@ -6,11 +6,13 @@ class ElapsedTimeWidget extends StatefulWidget {
 
   final DateTime time;
   final TextStyle? style;
+  final void Function(int) controlMinutes;
 
   const ElapsedTimeWidget({
     super.key,
     required this.time,
-    this.style,
+    this.style, 
+    required this.controlMinutes,
   });
 
   @override
@@ -22,20 +24,20 @@ class _ElapsedTimeWidgetState extends State<ElapsedTimeWidget> {
   Timer? _timer;
   String oldTime = "";
   String newTime = "";
-  Duration? _elapsedTime;
   
   @override
   void initState() {
     super.initState();
-    _elapsedTime = DateTime.now().difference(widget.time);
-    oldTime = format(_elapsedTime!);
+    Duration elapsedTime = DateTime.now().difference(widget.time);
+    oldTime = format(elapsedTime);
     _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
-      _elapsedTime = DateTime.now().difference(widget.time);
-      newTime = format(_elapsedTime!);
+      elapsedTime = DateTime.now().difference(widget.time);
+      newTime = format(elapsedTime);
       if (newTime != oldTime) {
         setState(() {
           oldTime = newTime;
         });
+        widget.controlMinutes(elapsedTime.inMinutes);
       }
     });
   }

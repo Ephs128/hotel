@@ -52,7 +52,15 @@ class StreamSocket{
         Room newRoom = Room(product: product);
         updater(newRoom);
       } else if (product.type == 3){
-        updateDevice(product);      }
+        updateDevice(product);      
+      }
+      if (data["habitacion1"] != null) {
+        Product product1 = Product.fromJson(data["habitacion1"]);
+        if (product1.type == 2) {
+          Room newRoom = Room(product: product1);
+          updater(newRoom);
+        } 
+      }
     });
   }
   

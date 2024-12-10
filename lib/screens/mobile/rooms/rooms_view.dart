@@ -123,6 +123,8 @@ class _RoomsViewState extends State<RoomsView> {
               return RoomCardWidget(
                 room: room, 
                 menu: widget.menu,
+                login: widget.login,
+                roomList: _roomList,
               );
             }).toList(),
           ),

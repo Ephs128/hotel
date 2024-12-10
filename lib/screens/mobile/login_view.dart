@@ -10,8 +10,8 @@ import 'package:hotel/screens/mobile/rooms/rooms_view.dart';
 
 import 'package:hotel/screens/mobile/widgets/dialogs.dart';
 import 'package:hotel/screens/mobile/without_options.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:hotel/data/env.dart';//! borrar
+// import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+// import 'package:hotel/data/env.dart';//! borrar
 
 class LoginView extends StatefulWidget {
   final String? message;
@@ -31,14 +31,14 @@ class _LoginViewState extends State<LoginView> {
 
   final GlobalKey<FormState> _loginFormState = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _ipController = TextEditingController(); //! borrar
+  // final TextEditingController _ipController = TextEditingController(); //! borrar
   final TextEditingController _passwordController = TextEditingController();
   final storage = const FlutterSecureStorage();
   bool showPassword = false;
 
   Future<void> sendPostRequest(BuildContext context) async {
     showLoaderDialog(context);
-      baseURL = _ipController.text;
+      // baseURL = _ipController.text;
       String user = _nameController.text;
       String password = _passwordController.text;
       final loginService = LoginService();
@@ -79,13 +79,13 @@ class _LoginViewState extends State<LoginView> {
   void dispose() {
     _nameController.dispose();
     _passwordController.dispose();
-    _ipController.dispose(); //! borrar
+    // _ipController.dispose(); //! borrar
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    _ipController.text = baseURL; //! borrar
+    // _ipController.text = baseURL; //! borrar
     return Scaffold(
       body: Center(
         child: Form(
@@ -96,11 +96,11 @@ class _LoginViewState extends State<LoginView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text("ip"),
-                TextFormField(
-                  controller: _ipController,
-                ),
-                const SizedBox(height: 10,),
+                // const Text("ip"),
+                // TextFormField(
+                //   controller: _ipController,
+                // ),
+                // const SizedBox(height: 10,),
                 const Text("Nombre usuario"),
                 TextFormField(
                   validator: (value) => _validator(value, 5, 19),
@@ -114,7 +114,7 @@ class _LoginViewState extends State<LoginView> {
                       obscureText: !showPassword,
                       enableSuggestions: false,
                       autocorrect: false,
-                      validator: (value) => _validator(value, 3, 9),
+                      validator: (value) => _validator(value, 3, 100),
                       controller: _passwordController,
                     ),
                 //     IconButton(

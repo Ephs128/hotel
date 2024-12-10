@@ -112,3 +112,37 @@ void showLoaderDialog(BuildContext context) {
   void closeLoaderDialog(BuildContext context) {
     Navigator.pop(context);
   }
+
+  void showBodyDialog(
+  {
+    required BuildContext context,
+    String title = "Confirmar", 
+    required Widget body,
+    required void Function() onConfirmation,
+    bool enableConfirmation = true,
+  }) {
+    showDialog(
+      context: context, 
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: body,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(), 
+              child: const Text("Cancelar")
+            ),
+            TextButton(
+              onPressed: enableConfirmation ? 
+                () {
+                  Navigator.of(context).pop();
+                  onConfirmation();
+                } 
+              : null, 
+              child: const Text("Realizar cambio")
+            )
+          ],
+        );
+      },
+    );
+  }

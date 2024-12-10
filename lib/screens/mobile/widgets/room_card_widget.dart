@@ -3,8 +3,10 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:hotel/data/models/compound_model.dart';
 import 'package:hotel/data/models/data.dart';
+import 'package:hotel/data/models/login_model.dart';
 import 'package:hotel/data/models/menu_model.dart';
 import 'package:hotel/data/models/product_model.dart';
+import 'package:hotel/data/models/user_model.dart';
 import 'package:hotel/data/service/room_service.dart';
 import 'package:hotel/screens/mobile/rooms/room_before_cleaning_view.dart';
 import 'package:hotel/screens/mobile/widgets/elapsed_time_widget.dart';
@@ -17,11 +19,15 @@ class RoomCardWidget extends StatefulWidget {
 
   final Room room;
   final Menu menu;
+  final Login login;
+  final List<Room> roomList;
 
   const RoomCardWidget({
     super.key,
     required this.room,
     required this.menu,
+    required this.login,
+    required this.roomList,
   });
 
   @override
@@ -31,10 +37,16 @@ class RoomCardWidget extends StatefulWidget {
 class _RoomCardWidgetState extends State<RoomCardWidget> {
   final roomService = RoomService();
   bool reviewPermission = false;
+  bool actionsVisible = true;
+  Room? _selectedRoom;
 
   @override
   void initState() {
     super.initState();
+    if (widget.room.product.time != null && widget.room.product.type == 1) {
+      Duration elapsedTime = DateTime.now().difference(widget.room.product.time!);
+      actionsVisible = elapsedTime.inMinutes <= 10;
+    }
   }
 
   @override
@@ -45,18 +57,18 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
     switch (widget.room.state) {
       case Room.free:
         bgHeader = const Color.fromARGB(255, 52, 195, 143);
-        // if(widget.menu.actions.containsKey("MMAAHB")){
-        //   buttons.add(
-        //     Padding(
-        //       padding: const EdgeInsets.symmetric(horizontal: 3),
-        //       child: IconButton(
-        //         icon: Icon(MdiIcons.play), 
-        //         color: Colors.white,
-        //         onPressed: () => {},
-        //       ),
-        //     )
-        //   );
-        // }
+        if(widget.menu.actions.containsKey("MMAAHB")){
+          buttons.add(
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 3),
+              child: IconButton(
+                icon: Icon(MdiIcons.play), 
+                color: Colors.white,
+                onPressed: () => _onClickEnableRoom(),
+              ),
+            )
+          );
+        }
         if(reviewPermission){
           buttons.add(
             Padding(
@@ -71,18 +83,50 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
         }
       case Room.inUse: // ocupied room
         bgHeader = const Color.fromARGB(255, 80, 165, 241);
-        // if(widget.menu.actions.containsKey("MMAARL")){ //! descomentar
+        if(widget.menu.actions.containsKey("MMAAHB")){ //! descomentar
+          if(actionsVisible){
+            buttons.add(
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 3),
+                child: IconButton(
+                  icon: Icon(MdiIcons.cancel), 
+                  color: Colors.white,
+                  onPressed: () => _onClickCancelRoom(),
+                ),
+              )
+            );
+            buttons.add(
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 3),
+                child: IconButton(
+                  icon: Icon(MdiIcons.cached), 
+                  color: Colors.white,
+                  onPressed: () => _onClickChangeRoom(),
+                ),
+              )
+            );
+          }
           // buttons.add(
           //   Padding(
           //     padding: const EdgeInsets.symmetric(horizontal: 3),
           //     child: IconButton(
           //       icon: Icon(MdiIcons.accountCash), 
           //       color: Colors.white,
-          //       onPressed: () => {},
+          //       onPressed: () => _onClickChargeRoom(),
           //     ),
           //   )
           // );
-        // } //! descomentar
+          // buttons.add(
+          //   Padding(
+          //     padding: const EdgeInsets.symmetric(horizontal: 3),
+          //     child: IconButton(
+          //       icon: Icon(MdiIcons.store), 
+          //       color: Colors.white,
+          //       onPressed: () => _onClickStore(),
+          //     ),
+          //   )
+          // );
+        } //! descomentar
       case Room.dirty:
         bgHeader = const Color.fromARGB(255, 244, 106, 106);
         if(widget.menu.actions.containsKey("MMAALP")){ 
@@ -216,6 +260,7 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
                         fontSize: 20,
                         color: Colors.white,
                       ),
+                      controlMinutes: controlMinutes,
                     ),
                 ],
               )
@@ -225,6 +270,18 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
       ),
     );
   }
+
+  void controlMinutes(int minutes) {
+    if (actionsVisible) {
+      if (minutes > widget.room.product.tolerance!) {
+        // if (minutes > 1) {
+        setState(() {
+          actionsVisible = false;
+        });
+      }
+    }
+  }
+
 
   format(Duration d) => d.toString().split('.').first.padLeft(5, "0");
 
@@ -245,20 +302,51 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
     }
   }
 
+  Future<void> _cleanRoom({required BuildContext context, required Room room, required void Function(String) onOk} ) async {
+    showLoaderDialog(context);
+    Data<String> result = await roomService.cleanRoom(room, user: widget.login.user);
+    if (context.mounted) closeLoaderDialog(context);
+    if (result.data == null) {
+      if (context.mounted) {
+        showMessageDialog(
+          context: context, 
+          title: "Error",
+          message: result.message
+        );
+      }
+    } else {
+      onOk(result.data!);
+    }
+  }
+
+  Future<void> _changeRoom({required BuildContext context, required Room room, required Room newRoom, required void Function(String) onOk} ) async {
+    showLoaderDialog(context);
+    Data<String> result = await roomService.changeRoom(room, newRoom);
+    if (context.mounted) closeLoaderDialog(context);
+    if (result.data == null) {
+      if (context.mounted) {
+        showMessageDialog(
+          context: context, 
+          title: "Error",
+          message: result.message
+        );
+      }
+    } else {
+      onOk(result.data!);
+    }
+  }
+
   void _onClickDirtyRoom() {
     showConfirmationDialog(
       context: context, 
       title: "¿Limpiar habitación?",
       message: "Se habilitará la cerradura y se encenderan las luces.",
       onConfirmation: () {
-        _actionRoom(
+        _cleanRoom(
           context:  context, 
           room: widget.room, 
-          serviceAction: roomService.cleanRoom, 
           onOk: (optionalMessage) =>  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => RoomBeforeCleaningView(room: widget.room, reviewPermission: reviewPermission))),
-            
         );
-      
       },
     );
   }
@@ -288,7 +376,7 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
     showConfirmationDialog(
       context: context, 
       title: "¿Empezar revisión?",
-      message: "Se habilitará la cerradura y se encenderan las luces.", 
+      message: "Se habilitará la cerradura y se encenderán las luces.", 
       onConfirmation: () {
         _actionRoom(
           context:  context, 
@@ -299,6 +387,141 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
         // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => RoomBeforeCleaningView(room: widget.room, reviewPermission: reviewPermission)));
       }
     );
+  }
+
+  void _onClickEnableRoom() {
+    showConfirmationDialog(
+      context: context, 
+      title: "¿Habilitar habitación?",
+      message: "Se habilitará la cerradura y se encenderán las luces.", 
+      onConfirmation: () {
+        _actionRoom(
+          context:  context, 
+          room: widget.room, 
+          serviceAction: roomService.enableRoom, 
+          onOk: (optionalMessage) {
+            showMessageDialog(context: context, title: "Bien", message: optionalMessage,);
+            setState(() {
+              actionsVisible = true;
+            });
+          },
+        );
+      }
+    );
+  }
+
+  void _onClickCancelRoom() {
+    showConfirmationDialog(
+      context: context, 
+      title: "¿Cancelar habitación?",
+      message: "Se desactivará la cerradura y se apagarán las luces.", 
+      onConfirmation: () {
+        _actionRoom(
+          context:  context, 
+          room: widget.room, 
+          serviceAction: roomService.cancelRoom, 
+          onOk: (optionalMessage) =>  showMessageDialog(context: context, title: "Bien", message: optionalMessage,),
+        );
+      }
+    );
+  }
+
+  void _onClickChargeRoom() {
+    // showConfirmationDialog(
+    //   context: context, 
+    //   title: "¿Cambiar de habitación?",
+    //   message: "Se habilitará la cerradura y se encenderán las luces.", 
+      
+    //   onConfirmation: () {
+    //     _actionRoom(
+    //       context:  context, 
+    //       room: widget.room, 
+    //       serviceAction: roomService.enableRoom, 
+    //       onOk: (optionalMessage) =>  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => RoomBeforeCleaningView(room: widget.room, reviewPermission: reviewPermission,))),
+    //     );
+    //     // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => RoomBeforeCleaningView(room: widget.room, reviewPermission: reviewPermission)));
+    //   }
+    // );
+  }
+
+  void _onClickChangeRoom() {
+    List<Room> freeRooms = widget.roomList.where((room) => room.product.activate == 0).toList();
+    showDialog(
+      context: context, 
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text("¿Cambiar de habitación?"),
+              content: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: freeRooms.map(
+                    (freeRoom) => ChoiceChip(
+                      label: SizedBox(width: double.maxFinite,child: Text(freeRoom.name)), 
+                      selected: _selectedRoom == freeRoom,
+                      selectedColor: const Color.fromARGB(255, 52, 195, 143),
+                      onSelected: (bool selected) {
+                        log("click");
+                        log(selected.toString());
+                        log(freeRoom.name);
+                        setState(() {
+                          log("inside set state");
+                          _selectedRoom = selected ? freeRoom : null;
+                          log("selected room value: ${_selectedRoom?.name}");
+                        });
+                      },
+                    )).toList(),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    _selectedRoom = null;
+                    Navigator.of(context).pop();
+                  }, 
+                  child: const Text("Cancelar")
+                ),
+                TextButton(
+                  onPressed: _selectedRoom != null ? 
+                    () {
+                      Navigator.of(context).pop();
+                      _changeRoom(
+                        context:  context, 
+                        room: widget.room, 
+                        newRoom: _selectedRoom!,
+                        onOk: (optionalMessage) {
+                          _selectedRoom = null;
+                          showMessageDialog(context: context, title: "Bien", message: optionalMessage,);
+                        },
+                      );
+                    } 
+                  : null, 
+                  child: const Text("Realizar cambio")
+                )
+              ],
+            );
+          }
+        );
+      },
+    );
+  }
+
+  void _onClickStore() {
+    // showConfirmationDialog(
+    //   context: context, 
+    //   title: "¿Habilitar habitación?",
+    //   message: "Se habilitará la cerradura y se encenderán las luces.", 
+    //   onConfirmation: () {
+    //     _actionRoom(
+    //       context:  context, 
+    //       room: widget.room, 
+    //       serviceAction: roomService.enableRoom, 
+    //       onOk: (optionalMessage) =>  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => RoomBeforeCleaningView(room: widget.room, reviewPermission: reviewPermission,))),
+    //     );
+    //     // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => RoomBeforeCleaningView(room: widget.room, reviewPermission: reviewPermission)));
+    //   }
+    // );
   }
 
   void _onClickFan(BuildContext context, Product device, bool isOff) async {

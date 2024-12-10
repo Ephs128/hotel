@@ -6,12 +6,15 @@ import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/models/product_model.dart';
 import 'package:hotel/data/models/room_model.dart';
 import 'package:hotel/data/models/room_state_model.dart';
+import 'package:hotel/data/models/user_model.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:hotel/data/env.dart';
+import 'package:intl/intl.dart';
 class RoomApi {
 
   final storage = const FlutterSecureStorage();
+  final DateFormat _timeFormat = DateFormat("HH:mm");
   String? _token;
 
   Future<Data<List<Room>>> getAllRooms() async {
@@ -46,6 +49,8 @@ class RoomApi {
     _token ??= await storage.read(key: "token") ?? "wtf?";
 
     var client = http.Client();
+    room.product.time = DateTime.now();
+    room.product.actualTime = _timeFormat.format(room.product.time!);
     var uri = Uri.parse('$baseURL/api/v1/rooms/enable');
     var response = await client.post(
       uri, 
@@ -70,10 +75,12 @@ class RoomApi {
     }
   }
 
-  Future<Data<String>> cleanRoom(Room room, int activate) async {
+  Future<Data<String>> cleanRoom(Room room, int activate, User? user) async {
     int oldval = room.product.activate;
     room.product.activate = activate;
     _token ??= await storage.read(key: "token") ?? "wtf?";
+    Map<String, dynamic> body = room.toJson();
+    if (user != null) body["limpieza"] = user.user;
 
     var client = http.Client();
     var uri = Uri.parse('$baseURL/api/v1/rooms/clean');
@@ -84,7 +91,7 @@ class RoomApi {
         'Accept': 'application/json',
         'Authorization': 'Bearer $_token',
       },
-      body: jsonEncode(room.toJson()),
+      body: jsonEncode(body),
     );
     final jsonData = jsonDecode(response.body) as Map<String, dynamic>;
     log("respuesta de peticion clean");
@@ -151,6 +158,38 @@ class RoomApi {
         "habitacion1": room1.toJson(),
         "habitacion2": room2.toJson()
       }),
+    );
+    final jsonData = jsonDecode(response.body) as Map<String, dynamic>;
+    if (response.statusCode == 200) {
+      return Data(
+        data: jsonData["data"]["message"],
+      );
+    } else {
+      return Data(
+        message: jsonData["message"],
+        statusCode: jsonData["status"],
+        data: null
+      );
+    }
+  }
+
+  _format(Duration d) => d.toString().split('.').first.padLeft(5, "0");
+
+  Future<Data<String>> cancelRoom(Room room) async {
+    _token ??= await storage.read(key: "token") ?? "wtf?";
+    Duration elapsedTime = DateTime.now().difference(room.product.time!);
+    room.product.actualTime = _format(elapsedTime);
+    log(room.toJson().toString());
+    var client = http.Client();
+    var uri = Uri.parse('$baseURL/api/v1/rooms/cancel');
+    var response = await client.post(
+      uri, 
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $_token',
+      },
+      body: jsonEncode(room.toJson()),
     );
     final jsonData = jsonDecode(response.body) as Map<String, dynamic>;
     if (response.statusCode == 200) {

@@ -24,6 +24,8 @@ class Product {
   bool? pulse;
   bool? selected;
   bool state;
+  int userRegister;
+  String dateRegister;
   String? onUrl;
   String? offUrl;
   List<Compound> compounds;
@@ -54,6 +56,8 @@ class Product {
     this.pulse,
     this.selected,
     required this.state,
+    required this.userRegister,
+    required this.dateRegister,
     this.price,
     this.onUrl,
     this.offUrl,
@@ -96,6 +100,8 @@ class Product {
       pulse: json["pulso"] == 1,
       selected: json["seleccionado"] == 1,
       state: json["estado"] == 1,
+      userRegister: json["usuarioRegistro"],
+      dateRegister: json["fechaRegistro"],
       price: json["precio"],
       onUrl: json["onUrl"],
       offUrl: json["offUrl"],
@@ -128,6 +134,8 @@ class Product {
     if (pulse != null) "pulso":  pulse! ? 1 : 0,
     if (selected != null) "seleccionado":  selected! ? 1 : 0,
     "estado":  state ? 1 : 0,
+    "usuarioRegistro": userRegister,
+    "fechaRegistro": dateRegister,
     if (price != null) "precio": price,
     if (onUrl != null) "onUrl": onUrl,
     if (offUrl != null) "offUrl": offUrl,
