@@ -116,20 +116,29 @@ class _RoomsViewState extends State<RoomsView> {
   }
 
   Widget body() {
-    return SingleChildScrollView(
-        child: Center(
-          child: Column(
-            children: _roomList.map((room) {
-              return RoomCardWidget(
-                room: room, 
-                menu: widget.menu,
-                login: widget.login,
-                roomList: _roomList,
-              );
-            }).toList(),
+    return RefreshIndicator(
+      onRefresh: () {
+        setState(() {
+          _isLoaded = false;
+        });
+        _fetchRooms();
+        return Future.value(true);
+      },
+      child: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              children: _roomList.map((room) {
+                return RoomCardWidget(
+                  room: room, 
+                  menu: widget.menu,
+                  login: widget.login,
+                  roomList: _roomList,
+                );
+              }).toList(),
+            ),
           ),
         ),
-      );
+    );
   }
 
   // Widget _whenErrorHappens() {

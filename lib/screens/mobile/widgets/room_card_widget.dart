@@ -1,4 +1,4 @@
-import 'dart:developer';
+// import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:hotel/data/models/compound_model.dart';
@@ -6,7 +6,6 @@ import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/models/login_model.dart';
 import 'package:hotel/data/models/menu_model.dart';
 import 'package:hotel/data/models/product_model.dart';
-import 'package:hotel/data/models/user_model.dart';
 import 'package:hotel/data/service/room_service.dart';
 import 'package:hotel/screens/mobile/rooms/room_before_cleaning_view.dart';
 import 'package:hotel/screens/mobile/widgets/elapsed_time_widget.dart';
@@ -273,8 +272,7 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
 
   void controlMinutes(int minutes) {
     if (actionsVisible) {
-      if (minutes > widget.room.product.tolerance!) {
-        // if (minutes > 1) {
+      if (minutes >= widget.room.product.tolerance!) {
         setState(() {
           actionsVisible = false;
         });
@@ -360,7 +358,6 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
         if(widget.room.product.time != null){
           Duration elapsedTime = DateTime.now().difference(widget.room.product.time!);
           widget.room.product.actualTime = format(elapsedTime);
-          log("hora actual: ${widget.room.product.actualTime}");
           _actionRoom(
             context:  context, 
             room: widget.room, 
@@ -462,13 +459,8 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
                       selected: _selectedRoom == freeRoom,
                       selectedColor: const Color.fromARGB(255, 52, 195, 143),
                       onSelected: (bool selected) {
-                        log("click");
-                        log(selected.toString());
-                        log(freeRoom.name);
                         setState(() {
-                          log("inside set state");
                           _selectedRoom = selected ? freeRoom : null;
-                          log("selected room value: ${_selectedRoom?.name}");
                         });
                       },
                     )).toList(),

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:hotel/data/models/compound_model.dart';
 import 'package:hotel/data/models/fee_model.dart';
 import 'package:hotel/data/models/product_promo_model.dart';
@@ -29,7 +31,7 @@ class Product {
   String? onUrl;
   String? offUrl;
   List<Compound> compounds;
-  String? price;
+  double? price;
   int? idFee;
   int? idCategory;
   Fee? fee;
@@ -74,13 +76,22 @@ class Product {
   factory Product.fromJson(Map<String, dynamic> json) { 
     List<dynamic> compoundList = json["compuestos"] ?? [];
     List<dynamic> promoList = json["promocionProductos"] ?? [];
+    var auxVar = json["precio"];
+    double? price;
     DateTime? time;
-    Fee? price;
+    Fee? fee;
     if (json["hora"] != null) {
       time = DateTime.parse(json["hora"]);
     }
     if (json["tarifa"] != null) {
-      price = Fee.fromJson(json["tarifa"]);
+      fee = Fee.fromJson(json["tarifa"]);
+    }
+    if(auxVar is String) {
+      price = double.parse(auxVar);
+    } else if (auxVar is double) {
+      price = auxVar;
+    }else if (auxVar is int) {
+      price = auxVar.toDouble();
     }
     return Product(
       idProduct: json["idProducto"],
@@ -102,13 +113,13 @@ class Product {
       state: json["estado"] == 1,
       userRegister: json["usuarioRegistro"],
       dateRegister: json["fechaRegistro"],
-      price: json["precio"],
+      price: price,
       onUrl: json["onUrl"],
       offUrl: json["offUrl"],
       compounds: compoundList.map((jsonData) => Compound.fromJson(jsonData)).toList(),
       idFee: json["idPrecio"],
       idCategory: json["idCategoria"],
-      fee: price,
+      fee: fee,
       promos: promoList.map((jsonData) => ProductPromo.fromJson(jsonData)).toList(),
       toleranceCharge: json["toleranciaCobro"],
       actualTime: json["horaActual"],
