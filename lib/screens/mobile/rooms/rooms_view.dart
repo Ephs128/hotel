@@ -50,7 +50,7 @@ class _RoomsViewState extends State<RoomsView> {
     bool found = false;
     for(Room room in _roomList) {
       for (Compound compound in room.product.compounds) {
-        found = compound.subproduct.idProduct == device.idProduct;
+        found = compound.subproduct!.idProduct == device.idProduct;
         if(found) {
           setState(() {
             compound.subproduct = device;

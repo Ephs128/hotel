@@ -4,8 +4,8 @@ class Room {
   Product product;
   late int id;
   late String name;
-  late String state;
-  late bool isActive;
+  late String statename;
+  late bool? state;
   static const String free = "Libre"; 
   static const String inUse = "Ocupado"; 
   static const String dirty = "Sucio"; 
@@ -21,26 +21,26 @@ class Room {
   }) {
     name = product.productName;
     id = product.idProduct;
-    isActive = product.state;
+    state = product.state;
     switch(product.activate) {
       case 0:
-        state = free;
+        statename = free;
       case 1:
-        state = inUse;
+        statename = inUse;
       case 2:
-        state = dirty;
+        statename = dirty;
       case 3:
-        state = cleaning;
+        statename = cleaning;
       case 4:
-        state = maintenance;
+        statename = maintenance;
       case 5:
-        state = outService;
+        statename = outService;
       case 6:
-        state = review;
+        statename = review;
       case 7:
-        state = vip;
+        statename = vip;
       default:
-        state = defaultState;
+        statename = defaultState;
     }
   }
 
@@ -53,8 +53,8 @@ class Room {
   void update(Room room) {
     if (id == room.id) {
       name = room.name;
+      statename = room.statename;
       state = room.state;
-      isActive = room.isActive;
       product.updateOnly(room.product);
     }
   }

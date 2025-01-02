@@ -7,7 +7,9 @@ import 'package:hotel/data/models/login_model.dart';
 import 'package:hotel/data/models/menu_model.dart';
 import 'package:hotel/data/models/product_model.dart';
 import 'package:hotel/data/service/room_service.dart';
+import 'package:hotel/screens/mobile/rooms/pay_view.dart';
 import 'package:hotel/screens/mobile/rooms/room_before_cleaning_view.dart';
+import 'package:hotel/screens/mobile/store/store_view.dart';
 import 'package:hotel/screens/mobile/widgets/elapsed_time_widget.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:hotel/data/models/room_model.dart';
@@ -53,7 +55,7 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
     List<Widget> buttons = [];
     late Color bgHeader;
     reviewPermission = widget.menu.actions.containsKey("MMAARL");
-    switch (widget.room.state) {
+    switch (widget.room.statename) {
       case Room.free:
         bgHeader = const Color.fromARGB(255, 52, 195, 143);
         if(widget.menu.actions.containsKey("MMAAHB")){
@@ -144,15 +146,15 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
         bgHeader = const Color.fromARGB(255, 241, 180, 76);
         if(widget.menu.actions.containsKey("MMAALP")){ 
           for(Compound compound in widget.room.product.compounds) {
-            if (compound.subproduct.type == 3) { // type 3 = device
-              if (compound.subproduct.productTYpe == 3) {// type 3 = fan
-                bool off = compound.subproduct.activate == 0;
+            if (compound.subproduct!.type == 3) { // type 3 = device
+              if (compound.subproduct!.productTYpe == 3) {// type 3 = fan
+                bool off = compound.subproduct!.activate == 0;
                 buttons.add(
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 3),
                     child: IconButton(
                       icon: Icon(off ? MdiIcons.fanOff: MdiIcons.fan), 
-                      onPressed: () => _onClickFan(context, compound.subproduct, off),
+                      onPressed: () => _onClickFan(context, compound.subproduct!, off),
                       color: off? Colors.white : Colors.red,
                     ),
                   )
@@ -179,15 +181,15 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
         bgHeader = const Color.fromARGB(255, 86, 74, 177);
         if(widget.menu.actions.containsKey("MMAALP") || reviewPermission ) {
           for(Compound compound in widget.room.product.compounds) {
-            if (compound.subproduct.type == 3) { // type 3 = device
-              if (compound.subproduct.productTYpe == 3) {// type 3 = fan
-                bool off = compound.subproduct.activate == 0;
+            if (compound.subproduct!.type == 3) { // type 3 = device
+              if (compound.subproduct!.productTYpe == 3) {// type 3 = fan
+                bool off = compound.subproduct!.activate == 0;
                 buttons.add(
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 3),
                     child: IconButton(
                       icon: Icon(off ? MdiIcons.fanOff: MdiIcons.fan), 
-                      onPressed: () => _onClickFan(context, compound.subproduct, off),
+                      onPressed: () => _onClickFan(context, compound.subproduct!, off),
                       color: off? Colors.white : Colors.red,
                     ),
                   )
@@ -246,13 +248,13 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    widget.room.state,
+                    widget.room.statename,
                     style: const TextStyle(
                       fontSize: 20,
                       color: Colors.white,
                     ), 
                   ),
-                  if (widget.room.product.time != null)
+                  if (widget.room.product.time != null && (widget.room.product.activate == 1 || widget.room.product.activate == 3))
                     ElapsedTimeWidget(
                       time: widget.room.product.time!,
                       style: const TextStyle(
@@ -424,6 +426,13 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
   }
 
   void _onClickChargeRoom() {
+    Navigator.push(
+      context, 
+      MaterialPageRoute(
+        builder: (BuildContext context) => 
+          PayView(room: widget.room, user: widget.login.user)   
+      )
+    );
     // showConfirmationDialog(
     //   context: context, 
     //   title: "¿Cambiar de habitación?",
@@ -500,20 +509,12 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
   }
 
   void _onClickStore() {
-    // showConfirmationDialog(
-    //   context: context, 
-    //   title: "¿Habilitar habitación?",
-    //   message: "Se habilitará la cerradura y se encenderán las luces.", 
-    //   onConfirmation: () {
-    //     _actionRoom(
-    //       context:  context, 
-    //       room: widget.room, 
-    //       serviceAction: roomService.enableRoom, 
-    //       onOk: (optionalMessage) =>  Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => RoomBeforeCleaningView(room: widget.room, reviewPermission: reviewPermission,))),
-    //     );
-    //     // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => RoomBeforeCleaningView(room: widget.room, reviewPermission: reviewPermission)));
-    //   }
-    // );
+    Navigator.push(
+      context, 
+      MaterialPageRoute(
+        builder: (BuildContext context) => StoreView(room: widget.room, user: widget.login.user,)
+      )
+    );
   }
 
   void _onClickFan(BuildContext context, Product device, bool isOff) async {

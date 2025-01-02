@@ -45,7 +45,7 @@ class RoomTableWidget extends StatelessWidget {
             children: [
               NormalTableCell(child: Text(room.name)),
               StateTableCell( 
-                status: room.isActive, 
+                status: room.state ?? false, 
                 activeLabel: "Activo", 
                 activeColor: Colors.green.lightest, 
                 inactiveColor: Colors.grey[110],

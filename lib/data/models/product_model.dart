@@ -1,9 +1,6 @@
-import 'dart:developer';
-
 import 'package:hotel/data/models/compound_model.dart';
 import 'package:hotel/data/models/fee_model.dart';
 import 'package:hotel/data/models/product_promo_model.dart';
-import 'package:hotel/data/models/promo_model.dart';
 import 'package:intl/intl.dart';
 
 class Product {
@@ -13,8 +10,8 @@ class Product {
   String? position;
   String? productCode;
   String? serie;
-  int type;
-  int activate;
+  int? type;
+  int? activate;
   int? productTYpe;
   int? idVenta;
   int? tolerance;
@@ -25,9 +22,9 @@ class Product {
   bool? automatic;
   bool? pulse;
   bool? selected;
-  bool state;
-  int userRegister;
-  String dateRegister;
+  bool? state;
+  int? userRegister;
+  String? dateRegister;
   String? onUrl;
   String? offUrl;
   List<Compound> compounds;
@@ -35,21 +32,22 @@ class Product {
   int? idFee;
   int? idCategory;
   Fee? fee;
-  List<ProductPromo> promos;
+  List<ProductPromo>? promos;
   int? idRoomState;
+  int? idStore;
    
   final DateFormat _dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
 
   Product({
     required this.idProduct,
     required this.productName,
-    required this.description,
+    this.description,
     this.position,
     this.productCode,
     this.serie,
-    required this.type,
+    this.type,
     this.productTYpe,
-    required this.activate,
+    this.activate,
     this.idVenta,
     this.tolerance,
     this.toleranceOff,
@@ -57,9 +55,9 @@ class Product {
     this.automatic,
     this.pulse,
     this.selected,
-    required this.state,
-    required this.userRegister,
-    required this.dateRegister,
+    this.state,
+    this.userRegister,
+    this.dateRegister,
     this.price,
     this.onUrl,
     this.offUrl,
@@ -67,7 +65,7 @@ class Product {
     this.idFee,
     this.idCategory,
     this.fee,
-    required this.promos,
+    this.promos,
     this.toleranceCharge,
     this.actualTime,
     this.idRoomState,
@@ -75,7 +73,7 @@ class Product {
 
   factory Product.fromJson(Map<String, dynamic> json) { 
     List<dynamic> compoundList = json["compuestos"] ?? [];
-    List<dynamic> promoList = json["promocionProductos"] ?? [];
+    List<dynamic>? promoList = json["promocionProductos"];
     var auxVar = json["precio"];
     double? price;
     DateTime? time;
@@ -120,7 +118,7 @@ class Product {
       idFee: json["idPrecio"],
       idCategory: json["idCategoria"],
       fee: fee,
-      promos: promoList.map((jsonData) => ProductPromo.fromJson(jsonData)).toList(),
+      promos: promoList?.map((jsonData) => ProductPromo.fromJson(jsonData)).toList(),
       toleranceCharge: json["toleranciaCobro"],
       actualTime: json["horaActual"],
       idRoomState: json["idEstadoHabitacion"],
@@ -134,9 +132,9 @@ class Product {
     if (position != null) "posicion": position,
     if (productCode != null) "codigoProducto": productCode,
     if (serie != null) "serie": serie,
-    "tipo": type,
+    if (type != null) "tipo": type,
     if (productTYpe != null) "tipoDispositivo": productTYpe,
-    "activado": activate,
+    if (activate != null) "activado": activate,
     if (idVenta != null) "idVenta": idVenta,
     if (tolerance != null) "tolerancia": tolerance,
     if (toleranceOff != null) "toleranciaOff": toleranceOff,
@@ -144,9 +142,9 @@ class Product {
     if (automatic != null) "automatico":  automatic! ? 1 : 0,
     if (pulse != null) "pulso":  pulse! ? 1 : 0,
     if (selected != null) "seleccionado":  selected! ? 1 : 0,
-    "estado":  state ? 1 : 0,
-    "usuarioRegistro": userRegister,
-    "fechaRegistro": dateRegister,
+    if (state != null) "estado":  state! ? 1 : 0,
+    if (userRegister != null) "usuarioRegistro": userRegister,
+    if (dateRegister != null) "fechaRegistro": dateRegister,
     if (price != null) "precio": price,
     if (onUrl != null) "onUrl": onUrl,
     if (offUrl != null) "offUrl": offUrl,
@@ -154,10 +152,11 @@ class Product {
     if (idFee != null) "idPrecio": idFee,
     if (idCategory != null) "idCategoria": idCategory,
     if (fee != null) "tarifa": fee!.toJson(),
-    "promocionProductos": promos.map((promo) => promo.toJson()).toList(),
+    if (promos != null) "promocionProductos": promos!.map((promo) => promo.toJson()).toList(),
     if (toleranceCharge != null) "toleranciaCobro": toleranceCharge,
     if (actualTime != null) "horaActual": actualTime,
     if (idRoomState != null) "idEstadoHabitacion": idRoomState,
+    if (idStore != null) "idAlmacen": idStore,
   };
 
   @override
@@ -190,5 +189,18 @@ class Product {
       idCategory = product.idCategory;
       idRoomState = product.idRoomState;
     }
+  }
+  
+  @override
+  bool operator ==(Object other) {
+    bool ans = other is Product;
+    if (ans) {
+      ans = idProduct == other.idProduct;
+    }
+    return ans;
   } 
+
+  @override
+  int get hashCode => idProduct.hashCode;
+
 }

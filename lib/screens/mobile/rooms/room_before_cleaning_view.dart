@@ -45,19 +45,19 @@ class _RoomBeforeCleaningViewState extends State<RoomBeforeCleaningView> {
   Widget build(BuildContext context) {
     List<Widget> devices = [];
     for (Compound compound in widget.room.product.compounds) {
-      if (compound.subproduct.type == 3) {
-        if (compound.subproduct.productTYpe == 3) {
-          bool off = compound.subproduct.activate == 0;
+      if (compound.subproduct!.type == 3) {
+        if (compound.subproduct!.productTYpe == 3) {
+          bool off = compound.subproduct!.activate == 0;
           devices.add(
             Row(
               children: [
                 Icon(MdiIcons.fan),
                 const SizedBox(width: 10,),
-                Text(compound.subproduct.productName),
+                Text(compound.subproduct!.productName),
                 const Spacer(),
                 Switch(
                   value: !off, 
-                  onChanged: (value) => _onClickFan(context, compound.subproduct, off),
+                  onChanged: (value) => _onClickFan(context, compound.subproduct!, off),
                 )
               ]
             )

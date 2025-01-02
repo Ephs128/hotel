@@ -76,7 +76,7 @@ class RoomApi {
   }
 
   Future<Data<String>> cleanRoom(Room room, int activate, User? user) async {
-    int oldval = room.product.activate;
+    int oldval = room.product.activate!;
     room.product.activate = activate;
     _token ??= await storage.read(key: "token") ?? "wtf?";
     Map<String, dynamic> body = room.toJson();
@@ -113,7 +113,7 @@ class RoomApi {
   Future<Data<String>> dispRoom(Product product, int activate) async {
     _token ??= await storage.read(key: "token") ?? "wtf?";
     
-    int oldval = product.activate;
+    int oldval = product.activate!;
     product.activate = activate;
 
     var client = http.Client();

@@ -2,7 +2,7 @@ class Fee {
 
   final int id;
   final String detail;
-  final String mount;
+  final String amount;
   final int time;
   final String additionalMount;
   final int additionalTime;
@@ -14,7 +14,7 @@ class Fee {
   Fee({
     required this.id,
     required this.detail,
-    required this.mount,
+    required this.amount,
     required this.time,
     required this.additionalMount,
     required this.additionalTime,
@@ -27,7 +27,7 @@ class Fee {
   factory Fee.fromJson(Map<String, dynamic> json) => Fee(
     id: json["idPrecio"],
     detail: json["detalle"],
-    mount: json["monto"],
+    amount: json["monto"],
     time: json["tiempo"],
     additionalMount: json["montoAdicional"],
     additionalTime: json["tiempoAdicional"],
@@ -40,7 +40,7 @@ class Fee {
   Map<String, dynamic> toJson() => {
     "idPrecio": id,
     "detalle": detail,
-    "monto": mount,
+    "monto": amount,
     "tiempo": time,
     "montoAdicional": additionalMount,
     "tiempoAdicional": additionalTime,

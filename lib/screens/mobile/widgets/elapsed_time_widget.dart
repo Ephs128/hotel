@@ -29,6 +29,7 @@ class _ElapsedTimeWidgetState extends State<ElapsedTimeWidget> {
   void initState() {
     super.initState();
     Duration elapsedTime = DateTime.now().difference(widget.time);
+    
     oldTime = format(elapsedTime);
     _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
       elapsedTime = DateTime.now().difference(widget.time);

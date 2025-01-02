@@ -37,7 +37,7 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
   @override
   Widget build(BuildContext context) {
     final Map<IconData, void Function(int)> actions = {};
-    switch (widget.room.state) {
+    switch (widget.room.statename) {
       case Room.free: // free room
         actions[FluentIcons.m_s_n_videos] = (int id) {
           showConfirmationDialog(
@@ -119,7 +119,7 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
             ),
             // Text(widget.room.type),
             const SizedBox(height: 30,),
-            Text(widget.room.state),
+            Text(widget.room.statename),
             if (widget.room.product.time != null)
               ElapsedTimeWidget(
                 time: widget.room.product.time!,
