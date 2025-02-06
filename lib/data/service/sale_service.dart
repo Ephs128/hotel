@@ -3,9 +3,16 @@ import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/models/sale_model.dart';
 import 'package:hotel/data/models/sale_product_model.dart';
 import 'package:hotel/data/provider/sale_api.dart';
+import 'package:hotel/env.dart';
 
 class SaleService {
-  final _api = SaleApi();
+
+  final Env env;
+  late SaleApi _api;
+
+  SaleService({required this.env}) {
+    _api = SaleApi(env: env);
+  }
 
   Future<Data<Sale>> getSale(int idSale) async {
     return _api.getSale(idSale);

@@ -27,6 +27,25 @@ android {
     namespace = "com.example.hotel"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
+    flavorDimensions "default"
+
+    productFlavors {
+        happy {
+            dimension "default"
+            resValue "string", "app_name", "happy"
+            applicationIdSuffix ".happy"
+        }
+        kama {
+            dimension "default"
+            resValue "string", "app_name", "kama"
+            applicationIdSuffix ".kama"
+        }
+        local {
+            dimension "default"
+            resValue "string", "app_name", "hotel_local"
+            applicationIdSuffix ".local"
+        }
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

@@ -16,6 +16,8 @@ class User {
   int? idSession;
   List<UserStore> stores;
   List<UserCashbox> cashboxes;
+  int? userRegister;
+  String? dateRegister;
 
   User({
     required this.idUser,
@@ -30,6 +32,8 @@ class User {
     required this.stores,
     required this.cashboxes,
     this.idSession,
+    this.userRegister,
+    this.dateRegister,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -56,6 +60,8 @@ class User {
       idSession: json["idSesion"],
       stores: listStores.map((jsonData) => UserStore.fromJson(jsonData)).toList(),
       cashboxes: listCashboxes.map((jsonData) => UserCashbox.fromJson(jsonData)).toList(),
+      userRegister: json["usuarioRegistro"],
+      dateRegister: json["fechaRegistro"],
     );
   }
 
@@ -72,6 +78,8 @@ class User {
     if(idSession != null) "idSesion": idSession,
     "usuarioAlmacenes": stores.map((store) => store.toJson()).toList(),
     "usuarioCajas": cashboxes.map((cashbox) => cashbox.toJson()).toList(),
+    if (userRegister != null) "usuarioRegistro": userRegister,
+    if (dateRegister != null) "fechaRegistro": dateRegister,
   };
     
 }

@@ -1,9 +1,17 @@
 import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/models/device_model.dart';
 import 'package:hotel/data/provider/device_api.dart';
+import 'package:hotel/env.dart';
 
 class DeviceService {
-  final _api = DeviceApi();
+  
+  final Env env;
+  late DeviceApi _api;
+
+  DeviceService({required this.env}) {
+    _api = DeviceApi(env: env);
+  }
+  
   Future<Data<List<Device>>> getAllDevices() {
     return _api.getAllDevices();
   }
@@ -16,7 +24,4 @@ class DeviceService {
     return _api.updateDevice(device);
   }
 
-  Future<Data<String>> deleteDevice(Device device) async {
-    return _api.deleteDevice(device);
-  }
 }

@@ -1,6 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/models/promo_model.dart';
 import 'package:hotel/data/models/room_model.dart';
@@ -8,15 +9,17 @@ import 'package:hotel/data/models/sale_model.dart';
 import 'package:hotel/data/models/sale_product_model.dart';
 import 'package:hotel/data/models/user_model.dart';
 import 'package:hotel/data/service/sale_service.dart';
+import 'package:hotel/env.dart';
 import 'package:http/http.dart' as http;
-import 'package:hotel/data/env.dart';
 import 'package:intl/intl.dart';
 
 class PayApi {
-  final storage = const FlutterSecureStorage();
+  
+  final Env env;
   final dateFormat = DateFormat('yyyy-MM-dd');
   final timeFormat = DateFormat('hh:mm:ss');
-  String? _token;
+  
+  PayApi({required this.env});
 
   Future<Data<String>> postPay (
     String time, 
@@ -32,7 +35,6 @@ class PayApi {
     int idCashbox,
     Promo? selectedPromo,
   ) async {
-    _token = await storage.read(key: "token") ?? "wtf?";
     DateTime now = DateTime.now();
     Map<String, dynamic> body = {};
     room.product.actualTime = time;
@@ -40,7 +42,7 @@ class PayApi {
     Map<String, dynamic> jsonRoom = room.toJson();
     jsonRoom["idAlmacen"] = user.stores.first;
     int idSale = room.product.idVenta!;
-    Data<Sale> saleData = await SaleService().getSale(idSale);
+    Data<Sale> saleData = await SaleService(env: env).getSale(idSale);
     Sale sale = saleData.data!;
     sale.amount = amountCharged.toString();
     sale.total = amountCharged.toString();
@@ -66,25 +68,39 @@ class PayApi {
       "idPromocion": selectedPromo?.id,
     };
     var client = http.Client();
-    var uri = Uri.parse('$baseURL/api/v1/pays/pay');
-    var response = await client.post(
-      uri, 
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $_token',
-      },
-      body: jsonEncode(body),
-    );
-    final postResult = json.decode(response.body) as Map<String, dynamic>;
-    if (response.statusCode == 200) {
+    var uri = Uri.parse('${env.baseUrl}/api/v1/pays/pay');
+    try {
+      var response = await client.post(
+        uri, 
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ${env.token}',
+        },
+        body: jsonEncode(body),
+      ).timeout(const Duration(seconds: 10));
+      final postResult = json.decode(response.body) as Map<String, dynamic>;
+      if (response.statusCode == 200) {
+        return Data(
+          data: postResult["data"]["message"],
+        );
+      } else {
+        return Data(
+          message: postResult["message"],
+          statusCode: postResult["status"],
+          data: null
+        );
+      }
+    } on TimeoutException catch (_) {
       return Data(
-        data: postResult["data"]["message"],
+        message: "Solicitud cancelada por tiempo de espera. Revisar conexion a internet",
+        statusCode: 0,
+        data: null
       );
-    } else {
+    } on SocketException catch (_) {
       return Data(
-        message: postResult["message"],
-        statusCode: postResult["status"],
+        message: "Error de red. Revisar la conexion a internet",
+        statusCode: 0,
         data: null
       );
     }

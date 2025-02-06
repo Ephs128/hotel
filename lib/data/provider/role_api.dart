@@ -1,37 +1,53 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/models/role_model.dart';
+import 'package:hotel/env.dart';
 import 'package:http/http.dart' as http;
-import 'package:hotel/data/env.dart';
 
 class RoleApi {
-  final storage = const FlutterSecureStorage();
+  
+  final Env env;
+
+  RoleApi({required this.env});
 
   Future<Data<List<Role>>> getAllRoles() async{
-    String token = await storage.read(key: "token") ?? "wtf?";
-
     var client = http.Client();
-    var uri = Uri.parse('$baseURL/api/v1/roles/list');
-    var response = await client.get(
-      uri, 
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
+    var uri = Uri.parse('${env.baseUrl}/api/v1/roles/list');
+    try {
+      var response = await client.get(
+        uri, 
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ${env.token}',
+        }
+      ).timeout(const Duration(seconds: 10));
+      final jsonData = json.decode(response.body) as Map<String, dynamic>;
+      if (response.statusCode == 200) {
+        List<dynamic> listData = jsonData["data"];
+        return Data(
+          data: listData.map((data) => Role.fromJson(data)).toList(),
+        );
+      } else {
+        return Data(
+          message: jsonData["message"],
+          statusCode: jsonData["status"],
+          data: null
+        );
       }
-    );
-    final jsonData = json.decode(response.body) as Map<String, dynamic>;
-    if (response.statusCode == 200) {
-      List<dynamic> listData = jsonData["data"];
+    } on TimeoutException catch (_) {
       return Data(
-        data: listData.map((data) => Role.fromJson(data)).toList(),
+        message: "Solicitud cancelada por tiempo de espera. Revisar conexion a internet",
+        statusCode: 0,
+        data: null
       );
-    } else {
+    } on SocketException catch (_) {
       return Data(
-        message: jsonData["message"],
-        statusCode: jsonData["status"],
+        message: "Error de red. Revisar la conexion a internet",
+        statusCode: 0,
         data: null
       );
     }

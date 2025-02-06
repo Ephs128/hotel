@@ -4,9 +4,16 @@ import 'package:hotel/data/models/room_model.dart';
 import 'package:hotel/data/models/room_state_model.dart';
 import 'package:hotel/data/models/user_model.dart';
 import 'package:hotel/data/provider/room_api.dart';
+import 'package:hotel/env.dart';
 
 class RoomService {
-  final _api = RoomApi();
+
+  final Env env;
+  late RoomApi _api;
+
+  RoomService({required this.env}) {
+    _api = RoomApi(env: env);
+  }
   
   Future<Data<List<Room>>> getAllRooms() async {
     return _api.getAllRooms();

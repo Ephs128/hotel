@@ -1,9 +1,17 @@
 import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/models/store_model.dart';
 import 'package:hotel/data/provider/store_api.dart';
+import 'package:hotel/env.dart';
 
 class StoreService {
-  final _api = StoreApi();
+
+  final Env env;
+  late StoreApi _api;
+
+  StoreService({required this.env}) {
+    _api = StoreApi(env: env);
+  }
+
   Future<Data<List<Store>>> getAllStores() {
     return _api.getAllStores();
   }

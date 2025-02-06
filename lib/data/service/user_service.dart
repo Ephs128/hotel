@@ -4,9 +4,17 @@ import 'package:hotel/data/models/role_model.dart';
 import 'package:hotel/data/models/store_model.dart';
 import 'package:hotel/data/models/user_model.dart';
 import 'package:hotel/data/provider/user_api.dart';
+import 'package:hotel/env.dart';
 
 class UserService {
-  final _api = UserApi();
+
+  final Env env;
+  late UserApi _api;
+
+  UserService({required this.env}) {
+    _api = UserApi(env: env);
+  }
+
   Future<Data<List<User>>> getAllUsers() async {
     return _api.getAllUsers();
   }

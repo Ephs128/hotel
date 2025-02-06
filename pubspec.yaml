@@ -45,6 +45,7 @@ dependencies:
   socket_io_client: ^2.0.3+1
   material_design_icons_flutter: ^7.0.7296
   jwt_decoder: ^2.0.1
+  internet_connection_checker_plus: ^2.7.0
 
 dev_dependencies:
   flutter_test:
@@ -77,6 +78,16 @@ flutter:
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/assets-and-images/#from-packages
+
+  assets:
+    - assets/common/
+    - path: assets/happy/
+      flavors:
+        - happy
+    - path: assets/kama/
+      flavors:
+        - kama
+    - shorebird.yaml
 
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a

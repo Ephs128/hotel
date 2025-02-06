@@ -3,9 +3,16 @@ import 'package:hotel/data/models/promo_model.dart';
 import 'package:hotel/data/models/room_model.dart';
 import 'package:hotel/data/models/user_model.dart';
 import 'package:hotel/data/provider/pay_api.dart';
+import 'package:hotel/env.dart';
 
 class PayService {
-  final PayApi _api = PayApi();
+  
+  final Env env;
+  late PayApi _api;
+
+  PayService({required this.env}) {
+    _api = PayApi(env: env);
+  }
 
   Future<Data<String>> postPay (
     String time, 

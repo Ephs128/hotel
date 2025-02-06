@@ -1,20 +1,25 @@
 import 'dart:async';
-import 'dart:convert';
+
 import 'dart:developer';
-import 'package:hotel/data/homeassistant.dart';
 import 'package:hotel/data/models/product_model.dart';
 import 'package:hotel/data/models/room_model.dart';
+import 'package:hotel/env.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'package:hotel/data/env.dart';
 
 class StreamSocket{
   final _socketResponse= StreamController<String>();
-  final _homeassistant =  Homeassistant();
   final void Function(Room) updater; 
   final void Function(Product) updateDevice; 
+  final void Function(bool) setConnection;
+  final Env env;
   late IO.Socket _socket;
 
-  StreamSocket(this.updater, this.updateDevice) ;
+  StreamSocket(
+    this.env, 
+    this.updater, 
+    this.updateDevice,
+    this.setConnection,
+  ) ;
 
   void Function(String) get addResponse => _socketResponse.sink.add;
 
@@ -27,19 +32,23 @@ class StreamSocket{
   }
 
   void connectAndListen(){
-    _socket = IO.io(baseURL,
+    _socket = IO.io(env.baseUrl,
       <String, dynamic> {
         'transports': ['websocket'],
       }
     );
 
     _socket.onConnect((_) {
-     log('connected to server');
+      log('connected to server');
+      setConnection(true);
     });
 
     //When an event recieved from server, data is added to the stream
     // socket.on('event', (data) => addResponse);
-    _socket.onDisconnect((_) => log('disconnect'));
+    _socket.onDisconnect((_) { 
+      log('disconnect');
+      setConnection(false);
+    });
 
     _socket.on("CODE-HAB", (data) {
       log("response socket");
