@@ -104,13 +104,13 @@ class _LoginViewState extends State<LoginView> {
                 //   controller: _ipController,
                 // ),
                 // const SizedBox(height: 10,),
-                const Text("Nombre usuario"),
+                const Text("Usuario:"),
                 TextFormField(
                   validator: (value) => _validator(value, 5, 19),
                   controller: _nameController,
                 ),
                 const SizedBox(height: 10,),
-                const Text("Contraseña"),
+                const Text("Contraseña:"),
                 // Row(
                   // children: [
                     TextFormField(

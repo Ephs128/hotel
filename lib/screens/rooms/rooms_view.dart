@@ -12,7 +12,6 @@ import 'package:hotel/data/stream_socket.dart';
 import 'package:hotel/env.dart';
 import 'package:hotel/screens/error_view.dart';
 import 'package:hotel/screens/loading_view.dart';
-import 'package:hotel/screens/widgets/custom_scaffold.dart';
 import 'package:hotel/screens/widgets/menu_widget.dart';
 import 'package:hotel/screens/widgets/room_card_widget.dart';
 
@@ -40,14 +39,12 @@ class _RoomsViewState extends State<RoomsView> {
   Data<List<Room>>? _result;
   late RoomService roomService;
   late StreamSocket _streamSocket;
-
+  
   void setConnection(bool val) {
-    setState(() {
-      _isConnected = val;
-    });
+    setState(() => _isConnected = val);
   }
 
-  void updater(Room newRoom) {
+  void updater(Room newRoom) async {
     final idx = _getIndexFrom(newRoom);
     if(idx < _roomList.length) {
       log("updated room");
@@ -89,11 +86,8 @@ class _RoomsViewState extends State<RoomsView> {
   @override
   void initState() {
     super.initState();
-    log("init");
     roomService = RoomService(env: widget.env);
     _fetchRooms();
-    _streamSocket = StreamSocket(widget.env, updater,updateDevice, setConnection);
-    _streamSocket.connectAndListen();
   }
 
   @override
@@ -106,6 +100,8 @@ class _RoomsViewState extends State<RoomsView> {
     log("calling api");
     _result = await roomService.getAllRooms();
     _roomList = _result!.data ?? [];
+    _streamSocket = StreamSocket(widget.env, updater, updateDevice, setConnection);
+    _streamSocket.connectAndListen();
     setState(() {
       log("loaded true?");
       _isLoaded = true;

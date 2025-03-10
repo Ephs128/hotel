@@ -11,6 +11,7 @@ import 'package:hotel/screens/rooms/rooms_view.dart';
 import 'package:hotel/screens/widgets/dialogs.dart';
 
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:shorebird_code_push/shorebird_code_push.dart';
 
 class MenuWidget extends StatefulWidget {
 
@@ -31,6 +32,28 @@ class MenuWidget extends StatefulWidget {
 
 class _MenuWidgetState extends State<MenuWidget> {
 
+  final ShorebirdUpdater _updater = ShorebirdUpdater();
+  late final bool _isUpdaterAvailable;
+  UpdateTrack _currentTrack = UpdateTrack.stable;
+  bool _isCheckingForUpdates = false;
+  Patch? _currentPatch;
+
+  @override
+  void initState() {
+    super.initState();
+    // Check whether Shorebird is available.
+    setState(() => _isUpdaterAvailable = _updater.isAvailable);
+
+    // Read the current patch (if there is one.)
+    // `currentPatch` will be `null` if no patch is installed.
+    _updater.readCurrentPatch().then((currentPatch) {
+      setState(() => _currentPatch = currentPatch);
+    }).catchError((Object error) {
+      // If an error occurs, we log it for now.
+      debugPrint('Error reading current patch: $error');
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<Widget> tiles = [
@@ -41,7 +64,9 @@ class _MenuWidgetState extends State<MenuWidget> {
           
           children: [
             Image(image: AssetImage('${widget.env.assetsPath}/logo.png'), height: 50,),
-            Text(widget.env.appName, style: const TextStyle(fontSize: 24),),]
+            Text(widget.env.appName, style: const TextStyle(fontSize: 24),),
+            Text(widget.env.version, style: const TextStyle(color: Colors.blueGrey),),
+          ]
         ),
       ),
     ];
@@ -71,6 +96,16 @@ class _MenuWidgetState extends State<MenuWidget> {
       Padding(
         padding: const EdgeInsets.only(bottom: 30),
         child: ListTile(
+          leading: Icon(MdiIcons.cellphoneArrowDown),
+          title:  const Text("Buscar actualizaciones"),
+          onTap: null,
+        ),
+      )
+    );
+    tiles.add(
+      Padding(
+        padding: const EdgeInsets.only(bottom: 30),
+        child: ListTile(
           leading: Icon(MdiIcons.logout),
           title:  const Text("Cerrar Sesión"),
           onTap: () {
@@ -82,6 +117,33 @@ class _MenuWidgetState extends State<MenuWidget> {
     return Drawer(
       child: Column(children: tiles),
     );
+  }
+
+  Future<void> _checkForUpdate() async {
+    if (_isCheckingForUpdates) return;
+
+    try {
+      setState(() {
+        _isCheckingForUpdates = true;
+      });
+      final status = await _updater.checkForUpdate(track: _currentTrack);
+      if (!mounted) return;
+      switch (status) {
+        case UpdateStatus.upToDate:
+        
+        case UpdateStatus.outdated:
+
+        case UpdateStatus.restartRequired:
+
+        case UpdateStatus.unavailable:
+
+      }
+    } catch (error) {
+      // If an error occurs, we log it for now.
+      debugPrint('Error checking for update: $error');
+    } finally {
+      setState(() => _isCheckingForUpdates = false);
+    }
   }
 
   void _logout(BuildContext context) async {

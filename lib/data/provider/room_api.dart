@@ -402,4 +402,44 @@ Future<Data<String>> cleanFinish(Room room) async {
     }
   }
 
+  Future<Data<String>> reenableRoom(Room room) async {
+    var client = http.Client();
+    var uri = Uri.parse('${env.baseUrl}/api/v1/rooms/re-enable');
+    try {
+      var response = await client.post(
+        uri, 
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ${env.token}',
+        },
+        body: jsonEncode(room.toJson()),
+      ).timeout(const Duration(seconds: 10));
+      final jsonData = jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.statusCode == 200) {
+        return Data(
+          data: jsonData["data"]["message"],
+        );
+      } else {
+        return Data(
+          message: jsonData["message"],
+          statusCode: jsonData["status"],
+          data: null
+        );
+      }
+    } on TimeoutException catch (_) {
+      return Data(
+        message: "Solicitud cancelada por tiempo de espera. Revisar conexion a internet",
+        statusCode: 0,
+        data: null
+      );
+    } on SocketException catch (_) {
+      return Data(
+        message: "Error de red. Revisar la conexion a internet",
+        statusCode: 0,
+        data: null
+      );
+    }
+  }
+
 }

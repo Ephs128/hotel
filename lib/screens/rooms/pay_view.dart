@@ -14,6 +14,7 @@ import 'package:hotel/data/models/user_cashbox_model.dart';
 import 'package:hotel/data/models/user_model.dart';
 import 'package:hotel/data/service/cashbox_service.dart';
 import 'package:hotel/data/service/pay_service.dart';
+import 'package:hotel/data/service/product_service.dart';
 import 'package:hotel/data/service/sale_service.dart';
 import 'package:hotel/env.dart';
 import 'package:hotel/screens/error_view.dart';
@@ -48,8 +49,8 @@ class _PayViewState extends State<PayView> {
   late CashboxService _cashboxService;
 
   final Map<Product, List<double>> _productTableData = {};
-  late Data<Sale> _resultSale;
-  late SaleService _saleService;
+  late Data<List<SaleProduct>> _resultSale;
+  late ProductService _productService;
   // final 
   bool _isLoaded = false;
   bool _showCompoundPayment = false;
@@ -78,7 +79,7 @@ class _PayViewState extends State<PayView> {
   void initState() {
     super.initState();
     _cashboxService = CashboxService(env: widget.env);
-    _saleService = SaleService(env: widget.env);
+    _productService = ProductService(env: widget.env);
     _fetchData();
     _qrController.text = "0";
     _transferController.text = "0";
@@ -95,9 +96,9 @@ class _PayViewState extends State<PayView> {
 
   Future<void> _fetchData() async {
     _result = await _cashboxService.getAllCashboxes();
-    _resultSale = await _saleService.getSale(widget.room.product.idVenta!);
+    _resultSale = await _productService.getProductsInSale(widget.room.product.idVenta!);
     List<Cashbox> cashboxList = _result.data ?? [];
-    Sale? sale = _resultSale.data;
+    List<SaleProduct> list = _resultSale.data ?? [];
     bool first  =true;
     for (UserCashbox userCashbox in widget.user.cashboxes) {
       int id = userCashbox.idCashbox;
@@ -110,9 +111,7 @@ class _PayViewState extends State<PayView> {
         }
       }
     }
-    if (sale != null) {
-      _getTableCells(sale);
-    }
+    _getTableCells(list);
     for(List<double> values in _productTableData.values) {
       _productsAmount += values.last;
     }
@@ -128,9 +127,10 @@ class _PayViewState extends State<PayView> {
     });
   }
 
-  void _getTableCells(Sale sale) {
-    for (SaleProduct saleProduct in sale.products) {
+  void _getTableCells(List<SaleProduct> products) {
+    for (SaleProduct saleProduct in products) {
       Product product = saleProduct.product;
+      log(product.productName);
       if (_productTableData.containsKey(product)) {
         List<double> data = _productTableData[product]!;
         data.first += 1;
@@ -166,8 +166,10 @@ class _PayViewState extends State<PayView> {
   void calculateRoomAmount(int elapsedMinutes) {
     Fee fee = widget.room.product.fee!;
     _roomTimeAmount = double.parse(fee.amount);
-    elapsedMinutes -= fee.time;
-    _roomTimeAmount += _calculateExtraTime(elapsedMinutes);
+    int extraTime = elapsedMinutes - fee.time;
+    if (extraTime > 0) {
+      _roomTimeAmount += _calculateExtraTime(extraTime);
+    }
   }
 
   double _calculateExtraTime(int time) {
@@ -610,7 +612,7 @@ class _PayViewState extends State<PayView> {
     showConfirmationDialog(
       context: context, 
       title: "Realizar cobro",
-      message: "Se va a cobrar Bs. $_totalAmount a \"${widget.room.name}\". ¿Continuar?", 
+      message: "Se va a cobrar Bs. $_totalAmount a \"${widget.room.name}\". El cuarto pasará al estado cobrando. ¿Continuar?", 
       onConfirmation: () {
         _fucntionCall(context);
       }
@@ -640,7 +642,7 @@ class _PayViewState extends State<PayView> {
       _transferController.text = "0";
     }
     PayService payService = PayService(env: widget.env);
-    Data<String> result = await payService.postPay(
+    Data<String> result = await payService.prePay(
       _roomTime, widget.room, _roomTimeAmount, _totalAmount, 
       widget.user, _selectedMethod+1, 
       double.parse(_cashController.text), 

@@ -6,6 +6,7 @@ import 'package:hotel/data/models/data.dart';
 import 'package:hotel/data/models/login_model.dart';
 import 'package:hotel/data/models/menu_model.dart';
 import 'package:hotel/data/models/product_model.dart';
+import 'package:hotel/data/service/pay_service.dart';
 import 'package:hotel/data/service/room_service.dart';
 import 'package:hotel/env.dart';
 import 'package:hotel/screens/rooms/pay_view.dart';
@@ -40,6 +41,7 @@ class RoomCardWidget extends StatefulWidget {
 
 class _RoomCardWidgetState extends State<RoomCardWidget> {
   late RoomService roomService = RoomService(env: widget.env);
+  late PayService payService = PayService(env: widget.env);
   bool reviewPermission = false;
   bool actionsVisible = true;
   Room? _selectedRoom;
@@ -110,6 +112,8 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
               )
             );
           }
+        }
+        if (widget.menu.actions.containsKey("MMAACB")) {
           buttons.add(
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 3),
@@ -120,6 +124,8 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
               ),
             )
           );
+        }
+        if (widget.menu.actions.containsKey("MMAAST")) {
           buttons.add(
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 3),
@@ -222,6 +228,30 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
         }
       case Room.vip:
         bgHeader = const Color.fromARGB(255, 232, 62, 140);
+      case Room.charging:
+        bgHeader = const Color.fromARGB(255, 131, 52, 195);
+        if(widget.menu.actions.containsKey("MMAACB")){
+          buttons.add(
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 3),
+              child: IconButton(
+                icon: Icon(MdiIcons.accountCash), 
+                color: Colors.white,
+                onPressed: () => _onClickConfirmPay(context),
+              ),
+            )
+          );
+          buttons.add(
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 3),
+              child: IconButton(
+                icon: Icon(MdiIcons.undo), 
+                color: Colors.white,
+                onPressed: () => _onClickUndo(context),
+              ),
+            )
+          );
+        }
       default:
         bgHeader = const Color.fromARGB(255, 255, 0, 0);
     }
@@ -564,6 +594,54 @@ class _RoomCardWidgetState extends State<RoomCardWidget> {
       }
     }
 
+  }
+  
+  void _onClickUndo(BuildContext context) async {
+    showConfirmationDialog(
+      context: context, 
+      title: "¿Deshacer el pago?",
+      message: "El tiempo de la habitación sigue corriendo.", 
+      onConfirmation: () => _callUndoPay(context),
+    );
+  }
+
+  void _callUndoPay(BuildContext context) async {
+    showLoaderDialog(context);
+    Data<String> result = await roomService.reenableRoom(widget.room);
+    if (context.mounted) {
+      closeLoaderDialog(context);
+      if(result.data == null) {
+        showMessageDialog(
+          context: context, 
+          title: "Hubo un error",
+          message: result.message,
+        );
+      } 
+    }
+  }
+
+  void _onClickConfirmPay(BuildContext context) {
+    showConfirmationDialog(
+      context: context, 
+      title: "Confirmación de pago",
+      message: "El cliente ya realizó el pago. Se desactivará la cerradura y se apagarán las luces.", 
+      onConfirmation: () => _callPayService(context),
+    );
+  }
+
+  void _callPayService(BuildContext context) async {
+    showLoaderDialog(context);
+    Data<String> result = await payService.pay(widget.room);
+    if (context.mounted) {
+      closeLoaderDialog(context);
+      if(result.data == null) {
+        showMessageDialog(
+          context: context, 
+          title: "Hubo un error",
+          message: result.message,
+        );
+      }
+    }
   }
 
 }

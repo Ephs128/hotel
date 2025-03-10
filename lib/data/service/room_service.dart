@@ -50,4 +50,8 @@ class RoomService {
   Future<Data<String>> generateReport(RoomState room) async {
     return _api.generateReport(room);
   }
+
+  Future<Data<String>> reenableRoom(Room room) async {
+    return _api.reenableRoom(room);
+  }
 }

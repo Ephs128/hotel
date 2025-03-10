@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'dart:developer';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hotel/data/models/product_model.dart';
 import 'package:hotel/data/models/room_model.dart';
 import 'package:hotel/env.dart';
@@ -13,6 +15,8 @@ class StreamSocket{
   final void Function(bool) setConnection;
   final Env env;
   late IO.Socket _socket;
+  final FlutterSecureStorage storage = const FlutterSecureStorage();
+  bool _isDisposing = false;
 
   StreamSocket(
     this.env, 
@@ -26,16 +30,17 @@ class StreamSocket{
   Stream<String> get getResponse => _socketResponse.stream;
 
   void dispose(){
+    _isDisposing = true;
     _socketResponse.close();
     _socket.disconnect();
     _socket.dispose();
   }
 
   void connectAndListen(){
-    _socket = IO.io(env.baseUrl,
-      <String, dynamic> {
-        'transports': ['websocket'],
-      }
+    _isDisposing = false;
+    _socket = IO.io(
+      env.baseUrl,
+      IO.OptionBuilder().setTransports(['websocket']).enableForceNew().build()
     );
 
     _socket.onConnect((_) {
@@ -47,7 +52,7 @@ class StreamSocket{
     // socket.on('event', (data) => addResponse);
     _socket.onDisconnect((_) { 
       log('disconnect');
-      setConnection(false);
+      if (!_isDisposing) setConnection(false);
     });
 
     _socket.on("CODE-HAB", (data) {
@@ -59,6 +64,9 @@ class StreamSocket{
       Product product = Product.fromJson(data["habitacion"]);
       if (product.type == 2) {
         Room newRoom = Room(product: product);
+        if (data["habitacion"]["esCobro"] != null) {
+          _updateStorage(data["habitacion"]["esCobro"], data, newRoom.id);
+        }
         updater(newRoom);
       } else if (product.type == 3){
         updateDevice(product);      
@@ -73,7 +81,15 @@ class StreamSocket{
     });
   }
   
-
+  void _updateStorage(int charge, Map<String, dynamic> data, int roomId) {
+    if (charge == 1) {
+      Map<String,dynamic> json = data["data"];
+      json.remove("habitacion");
+      storage.write(key: "room_$roomId", value: jsonEncode(json));
+    } else if (charge == 2) {
+      storage.delete(key: "room_$roomId");
+    }
+  }
   // void _callHomeAssistant() async {
   //   await _homeassistant.turnOnSwitch("switch.tasmota_tasmota2");
   // }

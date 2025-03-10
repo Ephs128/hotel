@@ -15,6 +15,7 @@ class Room {
   static const String review = "En revisión";
   static const String vip = "VIP"; 
   static const String defaultState = "Estado no considerado"; 
+  static const String charging = "Cobrando"; 
 
   Room({
     required this.product,
@@ -38,7 +39,7 @@ class Room {
       case 6:
         statename = review;
       case 7:
-        statename = vip;
+        statename = charging;
       default:
         statename = defaultState;
     }
